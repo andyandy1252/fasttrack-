@@ -20,6 +20,8 @@ const SCHS=[
   {id:12,name:"Xavier",state:"OH",div:"D1",conf:"Big East",coach:"Sean Miller",email:"miller@xavier.edu",enroll:"7,200",founded:1831,colors:"Blue & White",camps:[]},
 ];
 const STG=[{id:"interested",label:"Saved",c:"#475569"},{id:"emailed",label:"Emailed",c:"#2563eb"},{id:"viewed",label:"Viewed",c:"#7c3aed"},{id:"replied",label:"Replied",c:"#0284c7"},{id:"camped",label:"Camp",c:"#db2777"},{id:"offer",label:"Offer",c:"#059669"},{id:"committed",label:"Committed",c:"#f59e0b",gold:true}];
+const CONF_NORMALIZE={"Atlantic Coast Conference":"ACC","Big Ten Conference":"Big Ten","Big 12 Conference":"Big 12","BIG EAST Conference":"Big East","Big East Conference":"Big East","Big West Conference":"Big West","Big Sky Conference":"Big Sky","Big South Conference":"Big South","Southeastern Conference":"SEC","American Conference":"AAC","American Athletic":"AAC","Sun Belt Conference":"Sun Belt","Mid-American Conference":"MAC","Mountain West Conference":"Mountain West","West Coast Conference":"WCC","Atlantic Sun Conference":"ASUN","Atlantic 10 Conference":"Atlantic 10","The Summit League":"Summit League","Summit":"Summit League","Missouri Valley Conference":"Missouri Valley","Horizon League":"Horizon","Northeast Conference":"NEC","Patriot":"Patriot League","Southland Conference":"Southland","Coastal Athletic Association":"CAA","Metro Atlantic Athletic Conference":"MAAC","The Ivy League":"Ivy League","America East Conference":"America East","Southwestern Athletic Conf.":"SWAC","Conference USA":"CUSA","Southern Conference":"SoCon","Ohio Valley Conference":"Ohio Valley","Western Athletic Conference":"WAC","Pac-12 Conference":"Pac-12","Pennsylvania State Athletic Conference":"PSAC","Great Lakes Valley Conference":"GLVC","Lone Star Conference":"Lone Star","Lone Star Conference (possibly)":"Lone Star","Northern Sun Intercollegiate Conference":"NSIC","Rocky Mountain Athletic Conference":"RMAC","California Collegiate Athletic Association":"CCAA","Pacific West Conference":"PacWest","Central Atlantic Collegiate Conference":"CACC","South Atlantic Conference":"SAC","Great Lakes Intercollegiate Athletic Conference":"GLIAC","Gulf South Conference":"Gulf South","Mountain East Conference":"Mountain East","Sunshine State Conference":"SSC","Great Midwest Athletic Conference":"GMAC","Great American Conference":"GAC","East Coast Conference":"ECC","Northeast 10 Conference":"NE10","Mid-America Intercollegiate Athletics Association":"MIAA","Great Northwest Athletic Conference":"GNAC","Peach Belt Conference":"Peach Belt","{{sortname|Conference|Carolinas}}":"Conference Carolinas"};
+const normConf=c=>CONF_NORMALIZE[c]||c;
 const CLIPS=[{id:1,title:"Game-Winner vs Lincoln HS",type:"Scoring",dur:"0:12",views:34},{id:2,title:"Full-Court Assist",type:"Passing",dur:"0:08",views:21},{id:3,title:"Defensive Stop, 4th Qtr",type:"Defense",dur:"0:15",views:18},{id:4,title:"Three-Point Streak (3/3)",type:"Scoring",dur:"0:22",views:45},{id:5,title:"Off-Ball Screen Read",type:"IQ",dur:"0:10",views:12}];
 const ADB=[
   {id:1,first:"Marcus",last:"Johnson",positions:["Point Guard"],gradYear:"2027",school:"Lincoln HS",state:"NY",height:'6\'2"',weight:"185",gpa:"3.4",div:"D1",verified:true,views:52},
@@ -852,7 +854,7 @@ function AthleteApp({user=null}){
   const[schoolsLoading,setSchoolsLoading]=useState(true);
   useEffect(()=>{
     supabase.from("schools").select("*").order("school_name").then(({data,error})=>{
-      if(data)setSchools(data.map(s=>({id:s.id,name:s.school_name,div:s.division,conf:s.conference,state:s.state,athletics_url:s.athletics_url||"",coach:"",email:"",camps:[]})));
+      if(data)setSchools(data.map(s=>({id:s.id,name:s.school_name,div:s.division,conf:normConf(s.conference),state:s.state,athletics_url:s.athletics_url||"",coach:"",email:"",camps:[]})));
       setSchoolsLoading(false);
     });
   },[]);
@@ -899,8 +901,10 @@ function AthleteApp({user=null}){
     // Simulate: coach opens email ~30s later in demo
     const newId=ex?ex.id:Date.now();setTimeout(()=>setViewedThreads(v=>({...v,[newId]:true})),8000);
   };
-  const confs=["All",...new Set(schools.map(s=>s.conf))].filter(Boolean).sort();
-  const states=["All",...new Set(schools.map(s=>s.state)).values()].filter(Boolean).sort();
+  const filteredByDiv=divF==="All"?schools:schools.filter(s=>s.div===divF);
+  const confs=["All",...new Set(filteredByDiv.map(s=>s.conf))].filter(Boolean).sort();
+  const filteredByDivConf=filteredByDiv.filter(s=>confF==="All"||s.conf===confF);
+  const states=["All",...new Set(filteredByDivConf.map(s=>s.state))].filter(Boolean).sort();
   const fil=schools.filter(s=>{const q=search.toLowerCase();return(!q||[s.name,s.state,s.conf].some(v=>v&&v.toLowerCase().includes(q)))&&(divF==="All"||s.div===divF)&&(confF==="All"||s.conf===confF)&&(stateF==="All"||s.state===stateF);});
   const campConfs=["All",...new Set(schools.filter(s=>s.camps.length>0).map(s=>s.conf))].filter(Boolean);
   const campStates=["All",...new Set(schools.filter(s=>s.camps.length>0).map(s=>s.state)).values()].filter(Boolean).sort();
@@ -939,8 +943,8 @@ function AthleteApp({user=null}){
               {search&&<button onClick={()=>setSearch("")} style={{background:"none",border:"none",cursor:"pointer",padding:0,lineHeight:1,display:"flex"}}><Ic.x size={11} color={TL}/></button>}
             </div>
             <div style={{display:"flex",gap:5,alignItems:"center"}}>
-              <FilterPill label="Division" value={divF} options={["All","D1","D2","D3","NAIA","JUCO"]} onChange={setDivF}/>
-              <FilterPill label="Conference" value={confF} options={confs} onChange={setConfF}/>
+              <FilterPill label="Division" value={divF} options={["All","D1","D2","D3","NAIA","JUCO"]} onChange={v=>{setDivF(v);setConfF("All");setStateF("All");}}/>
+              <FilterPill label="Conference" value={confF} options={confs} onChange={v=>{setConfF(v);setStateF("All");}}/>
               <FilterPill label="State" value={stateF} options={states} onChange={setStateF}/>
               <span style={{marginLeft:"auto",fontSize:10,color:TL,flexShrink:0}}>{fil.length} schools</span>
             </div>

@@ -217,8 +217,9 @@ async function main() {
       division: row.division,
       mens_division: row.mens_division ?? ex.mens_division,
       womens_division: row.womens_division ?? ex.womens_division,
-      conference: coalescePreferNonEmpty(ex.conference, row.conference),
-      state: coalescePreferNonEmpty(ex.state, row.state),
+      // NCAA Directory is authoritative for NCAA schools.
+      conference: row.conference,
+      state: row.state,
       athletics_url: coalescePreferNonEmpty(ex.athletics_url, row.athletics_url),
       notes: coalescePreferNonEmpty(ex.notes, row.notes),
       mens_soccer_url: ex.mens_soccer_url,
