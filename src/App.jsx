@@ -1,5 +1,7 @@
 import{useState,useRef,useEffect}from"react";
-const B="#D97757",BH="#C4622A",BL="#FDF3EE",BR="#F5C4A8",PU="#5b21b6",PUH="#4c1d95",PUL="#f0ebff",PUB="#c4b5fd",G="#00875a",GL="#e3fcef",GBR="#57d9a3",W="#ffffff",GR="#f7f8fa",BD="#e4e7ec",T="#111827",TM="#4b5563",TL="#9ca3af";
+import{QRCodeCanvas}from"qrcode.react";
+import{supabase}from"./supabaseClient";
+const B="#D97757",BH="#C4622A",BL="var(--BL)",BR="var(--BR)",PU="#5b21b6",PUH="#4c1d95",PUL="var(--PUL)",PUB="#c4b5fd",G="#00875a",GL="var(--GL)",GBR="#57d9a3",W="var(--W)",GR="var(--GR)",BD="var(--BD)",T="var(--T)",TM="var(--TM)",TL="var(--TL)";
 const TY=new Date().getFullYear();
 const GY=Array.from({length:8},(_,i)=>`${TY+i}`);
 const SP={Basketball:["Point Guard","Shooting Guard","Small Forward","Power Forward","Center"],Football:["Quarterback","Running Back","Fullback","Wide Receiver","Tight End","Offensive Lineman","Defensive End","Linebacker","Cornerback","Safety","Kicker","Punter"],Soccer:["Goalkeeper (GK)","Right Back (RB)","Left Back (LB)","Center Back (CB)","Sweeper (SW)","Defensive Mid (CDM)","Central Mid (CM)","Attacking Mid (CAM)","Right Winger (RW)","Left Winger (LW)","Second Striker (SS)","Striker (ST)","Center Forward (CF)"],Wrestling:["125 lbs","133 lbs","141 lbs","149 lbs","157 lbs","165 lbs","174 lbs","184 lbs","197 lbs","285 lbs"],Lacrosse:["Attack","Midfield","Defense","Goalkeeper"]};
@@ -112,7 +114,7 @@ const DA={first:"Andrew",last:"Johnson",email:"andrew@email.com",sport:"Soccer",
 const DC={first:"Kyle",last:"Neptune",email:"neptune@fordham.edu",school:"Fordham University",div:"D1",conf:"Atlantic 10",sport:"Basketball",role:"Head Coach"};
 
 // SVGs
-const mk=p=>({active:a=false,size:s=22,color:cl}={})=>{const c=cl||(a?B:TL);return <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth={a?2.2:1.7} strokeLinecap="round" strokeLinejoin="round">{p}</svg>;};
+const mk=p=>({active:a=false,size:s=22,color:cl}={})=>{const c=cl||(a?B:TL);return <svg width={s} height={s} viewBox="0 0 24 24" fill="none" style={{stroke:c}} strokeWidth={a?2.2:1.7} strokeLinecap="round" strokeLinejoin="round">{p}</svg>;};
 const Ic={
   user:mk(<><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></>),
   search:mk(<><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/></>),
@@ -187,15 +189,26 @@ function PosPick({sport,sel,onChange,ac=B}){const ps=SP[sport]||[];const tg=p=>o
 
 const CSS=`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
+:root{
+  --W:#ffffff;--GR:#f7f8fa;--BD:#e4e7ec;--T:#111827;--TM:#4b5563;--TL:#9ca3af;
+  --BL:#FDF3EE;--BR:#F5C4A8;--PUL:#f0ebff;--GL:#e3fcef;
+  --nav-icon:#b0b8c4;
+}
+[data-theme=dark]{
+  --W:#111111;--GR:#0a0a0a;--BD:#222222;--T:#f0f0ee;--TM:#888888;--TL:#555555;
+  --BL:#2a1200;--BR:#7c3518;--PUL:#1e1040;--GL:#0a2e1e;
+  --nav-icon:#4a4a50;
+}
+
 *{box-sizing:border-box;margin:0;padding:0}
 html{touch-action:manipulation;-ms-touch-action:manipulation}
-body{text-align:left;-webkit-font-smoothing:antialiased;background:#f7f8fa}
+body{text-align:left;-webkit-font-smoothing:antialiased;background:var(--GR)}
 body,input,select,textarea,button{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI','Inter',sans-serif}
 *{-webkit-text-size-adjust:none;text-size-adjust:none}
 input,select,textarea{font-size:16px!important}
 ::-webkit-scrollbar{width:0}
 input:focus,select:focus,textarea:focus{outline:none}
-input::placeholder,textarea::placeholder{color:#9ca3af}
+input::placeholder,textarea::placeholder{color:var(--TL)}
 textarea{resize:none;line-height:1.6}
 
 /* Animations */
@@ -214,23 +227,23 @@ textarea{resize:none;line-height:1.6}
 
 /* School / athlete rows */
 .sr{
-  background:#fff;border-bottom:1px solid #e4e7ec;
+  background:var(--W);border-bottom:1px solid var(--BD);
   padding:14px 20px;cursor:pointer;
   display:flex;align-items:center;gap:14px;
   transition:background .1s;text-align:left
 }
-.sr:active{background:#f7f8fa}
+.sr:active{background:var(--GR)}
 
 /* Clip row */
 .ci{
-  background:#fff;border:1px solid #e4e7ec;border-radius:10px;
+  background:var(--W);border:1px solid var(--BD);border-radius:10px;
   padding:13px 15px;display:flex;align-items:center;gap:12px;
   cursor:pointer;transition:all .15s;margin-bottom:8px
 }
-.ci:active{background:#f7f8fa}
+.ci:active{background:var(--GR)}
 
 .sc,.bc{
-  background:#fff;border:1px solid #e4e7ec;border-radius:8px;
+  background:var(--W);border:1px solid var(--BD);border-radius:8px;
   padding:11px 13px;margin-bottom:6px;cursor:pointer;
   transition:border-color .12s
 }
@@ -238,16 +251,16 @@ textarea{resize:none;line-height:1.6}
 
 /* Message threads */
 .tr,.ar,.trc{
-  background:#fff;border-bottom:1px solid #e4e7ec;
+  background:var(--W);border-bottom:1px solid var(--BD);
   padding:14px 20px;cursor:pointer;
   display:flex;align-items:center;gap:13px;
   transition:background .1s
 }
-.tr:active,.ar:active,.trc:active{background:#f7f8fa}
+.tr:active,.ar:active,.trc:active{background:var(--GR)}
 
 /* Athlete / coach cards */
 .ac,.cc{
-  background:#fff;border:1px solid #e4e7ec;border-radius:12px;
+  background:var(--W);border:1px solid var(--BD);border-radius:12px;
   padding:16px;cursor:pointer;transition:all .15s
 }
 .ac:active,.cc:active{border-color:#D97757}
@@ -256,22 +269,22 @@ textarea{resize:none;line-height:1.6}
 
 /* Camp card */
 .campcard{
-  background:#fff;border:1px solid #e4e7ec;border-radius:12px;
+  background:var(--W);border:1px solid var(--BD);border-radius:12px;
   padding:18px;transition:all .15s;margin-bottom:12px
 }
 .campcard:active{border-color:#D97757}
 
 /* Pipeline board card */
 .bcard{
-  background:#fff;border:1px solid #e4e7ec;border-radius:8px;
+  background:var(--W);border:1px solid var(--BD);border-radius:8px;
   padding:12px;margin-bottom:6px;cursor:pointer;transition:all .12s
 }
-.bcard:active{background:#f7f8fa}
+.bcard:active{background:var(--GR)}
 
 /* Bottom navigation */
 .nav-app{
-  background:#fff;
-  border-top:1px solid #e4e7ec;
+  background:var(--W);
+  border-top:1px solid var(--BD);
   display:flex;flex-shrink:0;height:58px;
   padding:0 4px;
 }
@@ -348,7 +361,7 @@ function ThreadUI({thread,inp,setInp,onSend,endRef,ac,fromLabel,fromEmail,onAtta
 }
 
 // Onboarding
-function RoleSelect({onSelect,onJump}){
+function RoleSelect({onSelect,onJump,onSignIn}){
   const[hov,setHov]=useState(null);
   return <div style={{minHeight:"100vh",background:"#0D0D0D",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"32px 22px",textAlign:"left"}}>
     <style>{CSS}</style>
@@ -382,7 +395,7 @@ function RoleSelect({onSelect,onJump}){
         );})}
       </div>
 
-      <p style={{fontSize:12,color:"#444",textAlign:"center",marginBottom:28}}>Already have an account? <span style={{color:B,fontWeight:600,cursor:"pointer"}}>Sign in</span></p>
+      <p style={{fontSize:12,color:"#444",textAlign:"center",marginBottom:28}}>Already have an account? <span style={{color:B,fontWeight:600,cursor:"pointer"}} onClick={onSignIn}>Sign in</span></p>
 
       {/* Dev shortcuts */}
       <div style={{borderTop:"1px solid #1a1a1a",paddingTop:20}}>
@@ -401,8 +414,10 @@ function RoleSelect({onSelect,onJump}){
   </div>;
 }
 
-function AthleteOnboard({onComplete}){
+function AthleteOnboard({onComplete,onSignIn}){
   const[step,setStep]=useState(0);
+  const[authErr,setAuthErr]=useState("");
+  const[submitting,setSubmitting]=useState(false);
   const[f,setF]=useState({first:"",last:"",email:"",pw:"",gender:"",sport:"Basketball",positions:[],gradYear:"",school:"",state:"NY",gpa:"",height:"",weight:"",idDone:false,country:"United States",intl:false,heightCm:"",weightKg:"",club:"",academy:"",eligibilityStatus:"",satScore:"",actScore:"",toefl:"",matchVideo:false});
   const set=(k,v)=>setF(p=>({...p,[k]:v}));
   const setSport=v=>setF(p=>({...p,sport:v,positions:[]}));
@@ -474,14 +489,17 @@ function AthleteOnboard({onComplete}){
 </div>}
 
 {((isSoccer&&step===5)||(!isSoccer&&step===3))&&<div style={{marginTop:12}}><div style={{background:BL,border:`1px solid ${BR}`,borderRadius:4,padding:"12px 14px",fontSize:12,color:"#C4622A",lineHeight:1.6,marginBottom:14}}>Upload a school-issued student ID or athletic clearance card. Used only for verification.</div>{!f.idDone?<div onClick={()=>set("idDone",true)} style={{border:`1.5px dashed ${BD}`,borderRadius:5,padding:28,textAlign:"center",cursor:"pointer"}} onMouseEnter={e=>{e.currentTarget.style.borderColor=B;e.currentTarget.style.background=BL}} onMouseLeave={e=>{e.currentTarget.style.borderColor=BD;e.currentTarget.style.background=W}}><div style={{width:42,height:42,background:BL,border:`1px solid ${BR}`,borderRadius:5,display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 11px"}}><Ic.card size={20} color={B}/></div><p style={{fontSize:14,fontWeight:700,color:T,marginBottom:2}}>Upload Student ID</p><p style={{fontSize:12,color:TM}}>JPG, PNG or PDF — max 10 MB</p><div style={{marginTop:14,display:"inline-block",background:B,color:W,padding:"8px 22px",borderRadius:4,fontSize:12,fontWeight:700}}>Choose File</div></div>:<div style={{background:GL,border:"1px solid #6ee7b7",borderRadius:5,padding:24,textAlign:"center"}}><div style={{width:38,height:38,background:"#d1fae5",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 9px"}}><Ic.check size={18} color={G}/></div><p style={{fontSize:14,fontWeight:700,color:G,marginBottom:2}}>ID Uploaded</p><p style={{fontSize:12,color:TM}}>Verification within 24 hours.</p></div>}<p style={{fontSize:11,color:TM,background:"#fffbeb",border:"1px solid #fde68a",borderRadius:4,padding:"8px 12px",marginTop:10}}>Your ID is never shared with coaches or third parties.</p></div>}
-      <div style={{display:"flex",gap:8,marginTop:20}}>{step>0&&<Btn ch="Back" v="g" sx={{flex:1}} onClick={()=>setStep(s=>s-1)}/>}{step<steps-1?<Btn ch="Continue" dis={!ok[step]} sx={{flex:2}} onClick={()=>setStep(s=>s+1)}/>:<Btn ch="Create Account" sx={{flex:2}} onClick={()=>onComplete(f)}/>}</div>
-      <p style={{fontSize:12,color:TL,textAlign:"center",marginTop:14}}>Have an account? <span style={{color:B,fontWeight:600,cursor:"pointer"}}>Sign in</span></p>
+      {authErr&&<p style={{fontSize:12,color:"#ef4444",margin:"12px 0 0",lineHeight:1.4}}>{authErr}</p>}
+      <div style={{display:"flex",gap:8,marginTop:20}}>{step>0&&<Btn ch="Back" v="g" sx={{flex:1}} onClick={()=>setStep(s=>s-1)}/>}{step<steps-1?<Btn ch="Continue" dis={!ok[step]} sx={{flex:2}} onClick={()=>setStep(s=>s+1)}/>:<Btn ch={submitting?"Creating…":"Create Account"} dis={submitting} sx={{flex:2}} onClick={async()=>{setSubmitting(true);setAuthErr("");const{error}=await supabase.auth.signUp({email:f.email,password:f.pw,options:{data:{role:"athlete",first:f.first,last:f.last,sport:f.sport,positions:f.positions,gradYear:f.gradYear,school:f.school,state:f.state,gpa:f.gpa,height:f.height,weight:f.weight}}});setSubmitting(false);if(error){setAuthErr(error.message);}else{onComplete(f);}}}/>}</div>
+      <p style={{fontSize:12,color:TL,textAlign:"center",marginTop:14}}>Have an account? <span style={{color:B,fontWeight:600,cursor:"pointer"}} onClick={onSignIn}>Sign in</span></p>
     </div>
   </div>;
 }
 
-function CoachOnboard({onComplete}){
+function CoachOnboard({onComplete,onSignIn}){
   const[step,setStep]=useState(0);
+  const[authErr,setAuthErr]=useState("");
+  const[submitting,setSubmitting]=useState(false);
   const[f,setF]=useState({first:"",last:"",email:"",pw:"",school:"",div:"D1",conf:"",sport:"Basketball",role:"Head Coach",emailDone:false,credDone:false});
   const set=(k,v)=>setF(p=>({...p,[k]:v}));
   const ok=[f.first&&f.last&&f.email&&f.pw.length>=8,f.school&&f.div&&f.sport&&f.role,f.emailDone,true];
@@ -494,8 +512,9 @@ function CoachOnboard({onComplete}){
       {step===1&&<div style={{marginTop:12}}><FL label="School / University" ch={<FIn ac={PU} placeholder="Fordham University" value={f.school} onChange={e=>set("school",e.target.value)}/>}/><div style={{display:"flex",gap:9}}><FL label="Division" ch={<FSel ch={["D1","D2","D3","NAIA","JUCO"].map(d=><option key={d}>{d}</option>)} value={f.div} onChange={e=>set("div",e.target.value)} style={{width:"100%"}}/>}/><FL label="Conference" ch={<FIn ac={PU} placeholder="Atlantic 10" value={f.conf} onChange={e=>set("conf",e.target.value)}/>}/></div><div style={{display:"flex",gap:9}}><FL label="Sport" ch={<FSel ch={Object.keys(SP).map(s=><option key={s}>{s}</option>)} value={f.sport} onChange={e=>set("sport",e.target.value)} style={{width:"100%"}}/>}/><FL label="Role" ch={<FSel ch={["Head Coach","Associate HC","Assistant Coach","Dir. of Recruiting","Grad Assistant"].map(r=><option key={r}>{r}</option>)} value={f.role} onChange={e=>set("role",e.target.value)} style={{width:"100%"}}/>}/></div></div>}
       {step===2&&<div style={{marginTop:12}}>{!f.emailDone?<div style={{background:GR,border:`1px solid ${BD}`,borderRadius:6,padding:20,textAlign:"center"}}><div style={{width:40,height:40,background:PUL,border:`1px solid ${PUB}`,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 10px"}}><Ic.mail size={19} color={PU}/></div><p style={{fontSize:14,fontWeight:700,color:T,marginBottom:5}}>Check your school inbox</p><p style={{fontSize:12,color:TM,marginBottom:14}}>Link sent to <strong>{f.email||"your email"}</strong></p><Btn ch="I clicked the link" v="o" ac={PU} onClick={()=>set("emailDone",true)}/></div>:<div style={{background:GL,border:"1px solid #6ee7b7",borderRadius:6,padding:24,textAlign:"center"}}><div style={{width:38,height:38,background:"#d1fae5",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 9px"}}><Ic.check size={18} color={G}/></div><p style={{fontSize:14,fontWeight:700,color:G}}>Email Verified</p></div>}</div>}
       {step===3&&<div style={{marginTop:12}}>{!f.credDone?<div onClick={()=>set("credDone",true)} style={{border:`1.5px dashed ${BD}`,borderRadius:5,padding:28,textAlign:"center",cursor:"pointer"}} onMouseEnter={e=>{e.currentTarget.style.borderColor=PU;e.currentTarget.style.background=PUL}} onMouseLeave={e=>{e.currentTarget.style.borderColor=BD;e.currentTarget.style.background=W}}><div style={{width:42,height:42,background:PUL,border:`1px solid ${PUB}`,borderRadius:5,display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 11px"}}><Ic.file size={20} color={PU}/></div><p style={{fontSize:14,fontWeight:700,color:T,marginBottom:2}}>Upload Credentials</p><p style={{fontSize:12,color:TM}}>Contract, staff page, or employment letter</p><div style={{marginTop:14,display:"inline-block",background:PU,color:W,padding:"8px 22px",borderRadius:4,fontSize:12,fontWeight:700}}>Choose File</div></div>:<div style={{background:GL,border:"1px solid #6ee7b7",borderRadius:5,padding:24,textAlign:"center"}}><div style={{width:38,height:38,background:"#d1fae5",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 9px"}}><Ic.check size={18} color={G}/></div><p style={{fontSize:14,fontWeight:700,color:G,marginBottom:2}}>Credentials Uploaded</p><p style={{fontSize:12,color:TM}}>Verified badge within 24 hours.</p></div>}</div>}
-      <div style={{display:"flex",gap:8,marginTop:20}}>{step>0&&<Btn ch="Back" v="g" ac={PU} sx={{flex:1}} onClick={()=>setStep(s=>s-1)}/>}{step<3?<Btn ch="Continue" dis={!ok[step]} ac={PU} sx={{flex:2}} onClick={()=>setStep(s=>s+1)}/>:<Btn ch="Create Coach Account" ac={PU} sx={{flex:2}} onClick={()=>onComplete(f)}/>}</div>
-      <p style={{fontSize:12,color:TL,textAlign:"center",marginTop:14}}>Have an account? <span style={{color:PU,fontWeight:600,cursor:"pointer"}}>Sign in</span></p>
+      {authErr&&<p style={{fontSize:12,color:"#ef4444",margin:"12px 0 0",lineHeight:1.4}}>{authErr}</p>}
+      <div style={{display:"flex",gap:8,marginTop:20}}>{step>0&&<Btn ch="Back" v="g" ac={PU} sx={{flex:1}} onClick={()=>setStep(s=>s-1)}/>}{step<3?<Btn ch="Continue" dis={!ok[step]} ac={PU} sx={{flex:2}} onClick={()=>setStep(s=>s+1)}/>:<Btn ch={submitting?"Creating…":"Create Coach Account"} dis={submitting} ac={PU} sx={{flex:2}} onClick={async()=>{setSubmitting(true);setAuthErr("");const{error}=await supabase.auth.signUp({email:f.email,password:f.pw,options:{data:{role:"coach",first:f.first,last:f.last,school:f.school,div:f.div,conf:f.conf,sport:f.sport,coachRole:f.role}}});setSubmitting(false);if(error){setAuthErr(error.message);}else{onComplete(f);}}}/>}</div>
+      <p style={{fontSize:12,color:TL,textAlign:"center",marginTop:14}}>Have an account? <span style={{color:PU,fontWeight:600,cursor:"pointer"}} onClick={onSignIn}>Sign in</span></p>
     </div>
   </div>;
 }
@@ -505,6 +524,13 @@ function DarkProfile({user,posts,metricValues,setEditMetric,setSelPost,followers
   const[ptab,setPtab]=useState("overview");
   const[pfollowing,setPfollowing]=useState(false);
   const[psaved,setPsaved]=useState(false);
+  const[shareOpen,setShareOpen]=useState(false);
+  const[cpd,setCpd]=useState(false);
+  const qrRef=useRef(null);
+  const pUrl=`https://fasttrack.app/u/${(user?.first||"andrew").toLowerCase()}-${(user?.last||"johnson").toLowerCase()}-${user?.gradYear||"2027"}`;
+  const copyLink=()=>{navigator.clipboard?.writeText(pUrl);setCpd(true);setTimeout(()=>setCpd(false),2200);};
+  const downloadQR=()=>{const c=qrRef.current;if(c){const a=document.createElement("a");a.download=`${user?.first||"profile"}-fasttrack-qr.png`;a.href=c.toDataURL("image/png");a.click();}};
+  const shareProfile=()=>{if(navigator.share)navigator.share({title:`${user?.first||"Andrew"} ${user?.last||"Johnson"} — FastTrack`,url:pUrl});else copyLink();};
   const PBG="#0a0a0a",PCARD="#111111",PCARD2="#161616",PBD="#222222",PTXT="#f0f0ee",PTXT2="#888888",PTXT3="#555555",PACC="#D97757",PACC2="#C4622A";
   const pfn=user?.first||"Andrew",pln=user?.last||"Johnson";
   const ppos=(user?.positions||["Center Back (CB)"]).join(", ");
@@ -561,12 +587,6 @@ function DarkProfile({user,posts,metricValues,setEditMetric,setSelPost,followers
       </div>
 
       <div style={{padding:"36px 16px 0",background:PCARD,borderBottom:`1px solid ${PBD}`}}>
-        <div style={{display:"flex",justifyContent:"flex-end",marginBottom:10}}>
-          <div style={{display:"flex",gap:7}}>
-            <button className="pbtn-s" onClick={()=>setPsaved(s=>!s)}>{psaved?"Saved ✓":"Save"}</button>
-            <button className="pbtn-p" onClick={()=>setPfollowing(f=>!f)}>{pfollowing?"Following ✓":"Follow"}</button>
-          </div>
-        </div>
         <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
           <span style={{fontSize:20,fontWeight:800,color:PTXT,letterSpacing:-.5}}>{pfn} {pln}</span>
           <span style={{display:"inline-flex",alignItems:"center",gap:3,background:PACC,borderRadius:20,padding:"2px 7px"}}>
@@ -584,17 +604,30 @@ function DarkProfile({user,posts,metricValues,setEditMetric,setSelPost,followers
         </div>
         <div style={{display:"flex",gap:8,marginBottom:14}}>
           <button className="pbtn-p" style={{flex:2}} onClick={()=>setTab("messages")}>Message</button>
-          <button className="pbtn-s" style={{flex:1,fontSize:11}} onClick={()=>setEditOpen(true)}>Edit Profile</button>
-        </div>
-        <div style={{display:"flex",borderTop:`1px solid ${PBD}`}}>
-          {[[posts.length,"Clips"],[followers+accepted.length,"Followers"],[following,"Following"],[followReqs.filter(r=>!accepted.includes(r.id)).length,"Requests"]].map(([v,l],i,a)=>(
-            <button key={l} onClick={()=>(l==="Followers"||l==="Following"||l==="Requests")&&setFollowOpen(l.toLowerCase())} style={{flex:1,textAlign:"center",padding:"10px 0",background:"none",border:"none",borderRight:i<a.length-1?`1px solid ${PBD}`:"none",cursor:"pointer"}}>
-              <div style={{fontSize:15,fontWeight:700,color:PTXT,lineHeight:1}}>{v}</div>
-              <div style={{fontSize:8,color:PTXT3,marginTop:2,textTransform:"uppercase",letterSpacing:.5}}>{l}</div>
-            </button>
-          ))}
+          <button className="pbtn-s" style={{flex:1,fontSize:11}} onClick={()=>setShareOpen(true)}>Share</button>
+          <button className="pbtn-s" style={{flex:1,fontSize:11}} onClick={()=>setEditOpen(true)}>Edit</button>
         </div>
       </div>
+
+      <Sheet open={shareOpen} onClose={()=>setShareOpen(false)} title="Share Profile" sub={pUrl} ch={<>
+        <div style={{display:"flex",justifyContent:"center",marginBottom:16}}>
+          <div style={{background:"#ffffff",padding:16,borderRadius:14,boxShadow:"0 2px 16px rgba(0,0,0,.15)"}}>
+            <QRCodeCanvas ref={qrRef} value={pUrl} size={180} bgColor="#ffffff" fgColor="#111111" level="M"/>
+          </div>
+        </div>
+        <p style={{fontSize:11,color:TL,textAlign:"center",marginBottom:20,wordBreak:"break-all"}}>{pUrl}</p>
+        <div style={{display:"flex",gap:8}}>
+          <button onClick={copyLink} style={{flex:1,padding:"11px 0",borderRadius:8,border:`1px solid ${BD}`,background:cpd?BL:GR,color:cpd?B:T,fontSize:12,fontWeight:700,cursor:"pointer",transition:"all .15s"}}>
+            {cpd?"Copied ✓":"Copy Link"}
+          </button>
+          <button onClick={downloadQR} style={{flex:1,padding:"11px 0",borderRadius:8,border:`1px solid ${BD}`,background:GR,color:T,fontSize:12,fontWeight:700,cursor:"pointer"}}>
+            Download
+          </button>
+          <button onClick={shareProfile} style={{flex:1,padding:"11px 0",borderRadius:8,border:"none",background:B,color:"#fff",fontSize:12,fontWeight:700,cursor:"pointer"}}>
+            Share
+          </button>
+        </div>
+      </>}/>
 
       <div style={{height:8,background:`linear-gradient(180deg,${PCARD},${PBG})`}}/><PDiv/><div style={{height:8,background:`linear-gradient(180deg,${PBG},${PCARD})`}}/>
 
@@ -782,7 +815,7 @@ function AthleteApp({user=null}){
   const[campDiv,setCampDiv]=useState("All");
   const[campConf,setCampConf]=useState("All");
   const[campState,setCampState]=useState("All");
-  const[pip,setPip]=useState({interested:[SCHS[6]],emailed:[SCHS[0]],viewed:[SCHS[1]],replied:[SCHS[4]],camped:[SCHS[3]],offer:[SCHS[8]],committed:[]});
+  const[pip,setPip]=useState({interested:[],emailed:[],viewed:[],replied:[],camped:[],offer:[],committed:[]});
   const[cReqs,setCReqs]=useState([104,106]);
   const[copied,setCopied]=useState(null);
   const[editOpen,setEditOpen]=useState(false);
@@ -815,12 +848,20 @@ function AthleteApp({user=null}){
   const[nmSch,setNmSch]=useState(null);
   const[nmTxt,setNmTxt]=useState("");
   const msg=useMsgs(SA);
+  const[schools,setSchools]=useState([]);
+  const[schoolsLoading,setSchoolsLoading]=useState(true);
+  useEffect(()=>{
+    supabase.from("schools").select("*").order("school_name").then(({data,error})=>{
+      if(data)setSchools(data.map(s=>({id:s.id,name:s.school_name,div:s.division,conf:s.conference,state:s.state,athletics_url:s.athletics_url||"",coach:"",email:"",camps:[]})));
+      setSchoolsLoading(false);
+    });
+  },[]);
   const notify=m=>{setNotif(m);setTimeout(()=>setNotif(null),3e3);};
   // Auto-advance: when athlete opens a thread where coach has replied → move to Replied
   // When athlete opens any thread → move to Viewed (coach opened email sim)
   const openThread=t=>{
     msg.open(t);
-    const sch=SCHS.find(s=>s.id===t.schoolId);
+    const sch=schools.find(s=>s.id===t.schoolId);
     if(!sch)return;
     const hasCoachReply=t.msgs.some(m=>m.from==="coach");
     if(hasCoachReply){advanceTo(sch,"replied");}
@@ -844,12 +885,12 @@ function AthleteApp({user=null}){
     }
   };
   const addTo=(s,st)=>advanceTo(s,st);
-  const copyE=(e,id)=>{navigator.clipboard?.writeText(e).catch(()=>{});setCopied(id);setTimeout(()=>setCopied(null),2500);notify("Email copied");const s=SCHS.find(x=>x.id===id);if(s)advanceTo(s,"emailed");};
+  const copyE=(e,id)=>{navigator.clipboard?.writeText(e).catch(()=>{});setCopied(id);setTimeout(()=>setCopied(null),2500);notify("Email copied");const s=schools.find(x=>x.id===id);if(s)advanceTo(s,"emailed");};
   const reqCamp=(cid,sch)=>{if(cReqs.includes(cid))return;setCReqs(r=>[...r,cid]);advanceTo(sch,"camped");notify(`Spot requested — ${sch.name} will see your profile`);};
   const moveSt=(sch,from,to)=>{setPip(p=>({...p,[from]:p[from].filter(x=>x.id!==sch.id),[to]:[...p[to],sch]}));setMoveOpen(null);notify(`Moved to ${STG.find(s=>s.id===to).label}`);};
   const startMsg=()=>{
     if(!nmSch||!nmTxt.trim())return;
-    const sch=SCHS.find(s=>s.id===nmSch);const ex=msg.threads.find(t=>t.schoolId===sch.id);
+    const sch=schools.find(s=>s.id===nmSch);const ex=msg.threads.find(t=>t.schoolId===sch.id);
     const now=new Date();const ts=`${now.toLocaleDateString("en-US",{month:"short",day:"numeric"})}, ${now.toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"})}`;
     const m={id:Date.now(),from:"athlete",text:nmTxt.trim(),time:ts};
     if(ex){msg.setT(ts=>ts.map(t=>t.id===ex.id?{...t,msgs:[...t.msgs,m]}:t));msg.setA({...ex,msgs:[...ex.msgs,m]});}
@@ -858,12 +899,12 @@ function AthleteApp({user=null}){
     // Simulate: coach opens email ~30s later in demo
     const newId=ex?ex.id:Date.now();setTimeout(()=>setViewedThreads(v=>({...v,[newId]:true})),8000);
   };
-  const confs=["All",...new Set(SCHS.map(s=>s.conf))].filter(Boolean);
-  const states=["All",...new Set(SCHS.map(s=>s.state)).values()].filter(Boolean).sort();
-  const fil=SCHS.filter(s=>{const q=search.toLowerCase();return(!q||[s.name,s.state,s.conf,s.coach].some(v=>v.toLowerCase().includes(q)))&&(divF==="All"||s.div===divF)&&(confF==="All"||s.conf===confF)&&(stateF==="All"||s.state===stateF);});
-  const campConfs=["All",...new Set(SCHS.filter(s=>s.camps.length>0).map(s=>s.conf))].filter(Boolean);
-  const campStates=["All",...new Set(SCHS.filter(s=>s.camps.length>0).map(s=>s.state)).values()].filter(Boolean).sort();
-  const allCamps=SCHS.flatMap(sch=>sch.camps.map(c=>({c,sch}))).filter(({c,sch})=>{const q=campSrch.toLowerCase();return(!q||[c.title,sch.name,c.loc].some(v=>v.toLowerCase().includes(q)))&&(campDiv==="All"||sch.div===campDiv)&&(campConf==="All"||sch.conf===campConf)&&(campState==="All"||sch.state===campState);});
+  const confs=["All",...new Set(schools.map(s=>s.conf))].filter(Boolean).sort();
+  const states=["All",...new Set(schools.map(s=>s.state)).values()].filter(Boolean).sort();
+  const fil=schools.filter(s=>{const q=search.toLowerCase();return(!q||[s.name,s.state,s.conf].some(v=>v&&v.toLowerCase().includes(q)))&&(divF==="All"||s.div===divF)&&(confF==="All"||s.conf===confF)&&(stateF==="All"||s.state===stateF);});
+  const campConfs=["All",...new Set(schools.filter(s=>s.camps.length>0).map(s=>s.conf))].filter(Boolean);
+  const campStates=["All",...new Set(schools.filter(s=>s.camps.length>0).map(s=>s.state)).values()].filter(Boolean).sort();
+  const allCamps=schools.flatMap(sch=>sch.camps.map(c=>({c,sch}))).filter(({c,sch})=>{const q=campSrch.toLowerCase();return(!q||[c.title,sch.name,c.loc].some(v=>v&&v.toLowerCase().includes(q)))&&(campDiv==="All"||sch.div===campDiv)&&(campConf==="All"||sch.conf===campConf)&&(campState==="All"||sch.state===campState);});
   const tT=allT.length,tE=[pip.emailed,pip.viewed||[],pip.replied,pip.camped,pip.offer].flat().length,tC=cReqs.length,tO=pip.offer.length;
   const fn=user?.first||"Marcus",ln=user?.last||"Johnson",pos=(user?.positions||["Point Guard"]).join(", "),aEmail=user?.email||"athlete@email.com";
   const slug=`${fn}-${ln}`.toLowerCase().replace(/\s+/g,"-");
@@ -905,19 +946,19 @@ function AthleteApp({user=null}){
             </div>
           </div>
           <div style={{background:W}}>
-            {fil.map(s=>{const tr=inP(s.id);return <div key={s.id} className="sr" onClick={()=>setSelSch(s)} style={{padding:"8px 14px"}}>
+            {schoolsLoading&&<p style={{padding:"36px 17px",textAlign:"center",color:TL,fontSize:13}}>Loading schools…</p>}
+            {!schoolsLoading&&fil.map(s=>{const tr=inP(s.id);return <div key={s.id} className="sr" onClick={()=>setSelSch(s)} style={{padding:"8px 14px"}}>
               <div style={{flex:1,minWidth:0}}>
                 <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:2}}>
                   <span style={{fontSize:12,fontWeight:700,color:T}}>{s.name}</span>
                   <span style={{fontSize:10,fontWeight:600,color:B,background:BL,padding:"1px 6px",borderRadius:3}}>{s.div}</span>
                   {tr&&<span style={{fontSize:10,color:G,fontWeight:600}}>✓</span>}
                 </div>
-                <p style={{fontSize:10,color:TM,margin:0,marginBottom:s.camps.length>0?1:0}}>{s.coach} · {s.conf} · {s.state}</p>
-                {s.camps.length>0&&<p style={{fontSize:9,color:B,fontWeight:600,margin:0}}>{s.camps.length} camp{s.camps.length>1?"s":""}</p>}
+                <p style={{fontSize:10,color:TM,margin:0}}>{s.conf} · {s.state}</p>
               </div>
               <button onClick={e=>{e.stopPropagation();save(s);}} style={{background:tr?GL:GR,border:`1px solid ${tr?GBR:BD}`,cursor:"pointer",fontSize:11,fontWeight:600,color:tr?G:TM,padding:"4px 10px",borderRadius:5,flexShrink:0}}>{tr?"Saved":"Save"}</button>
             </div>;})}
-            {!fil.length&&<p style={{padding:"36px 17px",textAlign:"center",color:TL,fontSize:13}}>No schools match your search.</p>}
+            {!schoolsLoading&&!fil.length&&<p style={{padding:"36px 17px",textAlign:"center",color:TL,fontSize:13}}>No schools match your search.</p>}
           </div>
       </div>}
 
@@ -1045,7 +1086,7 @@ function AthleteApp({user=null}){
         <div style={{background:W,marginBottom:8}}>
           <div style={{padding:"13px 17px 8px"}}><p style={{fontSize:11,fontWeight:700,color:TL,letterSpacing:.3,textTransform:"uppercase",margin:0}}>Camps Requested ({cReqs.length})</p></div>
           {!cReqs.length?<p style={{padding:"18px 17px",textAlign:"center",color:TL,fontSize:12}}>None yet. <span style={{color:B,fontWeight:600,cursor:"pointer"}} onClick={()=>setTab("schools")}>Browse camps</span></p>
-          :SCHS.flatMap(s=>s.camps.filter(c=>cReqs.includes(c.id)).map(c=>({c,sch:s}))).map(({c,sch},i,arr)=><div key={c.id} style={{padding:"9px 16px",borderBottom:i<arr.length-1?`1px solid ${GR}`:"none",display:"flex",alignItems:"center",gap:10}}>
+          :schools.flatMap(s=>s.camps.filter(c=>cReqs.includes(c.id)).map(c=>({c,sch:s}))).map(({c,sch},i,arr)=><div key={c.id} style={{padding:"9px 16px",borderBottom:i<arr.length-1?`1px solid ${GR}`:"none",display:"flex",alignItems:"center",gap:10}}>
             <div style={{flex:1,minWidth:0}}><p style={{fontSize:12,fontWeight:600,color:T,margin:0,marginBottom:1}}>{c.title}</p><p style={{fontSize:10,color:TM,margin:0}}>{sch.name} · {c.date}</p></div>
             <div style={{textAlign:"right",flexShrink:0}}><p style={{fontSize:12,fontWeight:700,color:T,margin:0,marginBottom:2}}>{c.cost}</p><span style={{fontSize:10,color:G,fontWeight:600}}>Requested</span></div>
           </div>)}
@@ -1057,7 +1098,7 @@ function AthleteApp({user=null}){
     <nav className="nav-app">
       {TABS.map(({id,label,Ic:Icon})=>{const a=tab===id,badge=id==="messages"?msg.total:0;return <button key={id} className="nav-btn" onClick={()=>{setTab(id);if(id!=="messages")msg.setA(null);}}>
         <div style={{position:"relative",display:"flex",alignItems:"center",justifyContent:"center",width:28,height:a?22:26}}>
-          <Icon active={a} color={a?B:"#b0b8c4"} size={a?19:21}/>
+          <Icon active={a} color={a?B:"var(--nav-icon)"} size={a?19:21}/>
           {badge>0&&<div style={{position:"absolute",top:-2,right:-4,width:13,height:13,borderRadius:"50%",background:"#ef4444",color:W,fontSize:8,fontWeight:800,display:"flex",alignItems:"center",justifyContent:"center",border:`1.5px solid ${W}`}}>{badge}</div>}
         </div>
         {a&&<span className="nav-label" style={{color:B}}>{label}</span>}
@@ -1169,7 +1210,7 @@ function AthleteApp({user=null}){
 
     {/* NEW MESSAGE SHEET */}
     <Sheet open={nmo} onClose={()=>{setNmo(false);setNmSch(null);setNmTxt("");}} title="New Message" ch={<>
-      <FL label="To" ch={<><FSel ch={[<option key="" value="" disabled>Select a coach / school…</option>,...SCHS.map(s=><option key={s.id} value={s.id}>{s.coach} — {s.name}</option>)]} value={nmSch||""} onChange={e=>setNmSch(Number(e.target.value))}/>{nmSch&&<p style={{fontSize:11,color:TM,marginTop:4}}>Sends to <span style={{color:B,fontWeight:600}}>{SCHS.find(s=>s.id===nmSch)?.email}</span></p>}</>}/>
+      <FL label="To" ch={<><FSel ch={[<option key="" value="" disabled>Select a school…</option>,...schools.map(s=><option key={s.id} value={s.id}>{s.name} ({s.div} · {s.state})</option>)]} value={nmSch||""} onChange={e=>setNmSch(Number(e.target.value))}/>{nmSch&&<p style={{fontSize:11,color:TM,marginTop:4}}>You can connect with <span style={{color:B,fontWeight:600}}>{schools.find(s=>s.id===nmSch)?.name}</span></p>}</>}/>
       <FL label="Message" ch={<div style={{border:`1.5px solid ${BD}`,borderRadius:4,padding:"9px 12px"}} onFocus={e=>e.currentTarget.style.borderColor=B} onBlur={e=>e.currentTarget.style.borderColor=BD}><textarea rows={5} placeholder="Write your message…" value={nmTxt} onChange={e=>setNmTxt(e.target.value)} style={{background:"transparent",width:"100%",border:"none",outline:"none",fontSize:13,color:T}}/></div>}/>
       <div style={{background:BL,border:`1px solid ${BR}`,borderRadius:4,padding:"8px 12px",marginBottom:15,display:"flex",gap:6}}><Ic.info size={12} active/><p style={{fontSize:11,color:"#C4622A",margin:0,lineHeight:1.5}}>Sends as a real email and creates a thread in the coach's inbox.</p></div>
       <Btn ch="Send Message" full dis={!nmSch||!nmTxt.trim()} onClick={startMsg}/>
@@ -1483,7 +1524,7 @@ function CoachApp({user=null}){
   const[camps,setCamps]=useState(SCAMPS);
   const[campOpen,setCampOpen]=useState(false);const[selCamp,setSelCamp]=useState(null);
   const[cf,setCf]=useState({title:"",date:"",loc:"",cost:"",total:"",sport:"Basketball",desc:""});
-  const[nmo,setNmo]=useState(false);const[nma,setNma]=useState(null);const[nmt,setNmt]=useState("");const[favs,setFavs]=useState([]);const[settingsOpen,setSettingsOpen]=useState(false);
+  const[nmo,setNmo]=useState(false);const[nma,setNma]=useState(null);const[nmt,setNmt]=useState("");const[favs,setFavs]=useState([]);const[followed,setFollowed]=useState([]);const[settingsOpen,setSettingsOpen]=useState(false);
   const msg=useMsgs(SC);
   const notify=m=>{setNotif(m);setTimeout(()=>setNotif(null),3e3);};
   const allB=Object.values(board).flat();
@@ -1683,7 +1724,10 @@ function CoachApp({user=null}){
             </div>
             <div style={{display:"flex",flexDirection:"column",gap:5,flexShrink:0,alignItems:"flex-end"}}>
               <button onClick={e=>{e.stopPropagation();saveB(a);}} style={{background:sv?BL:GR,border:`1px solid ${sv?BR:BD}`,cursor:"pointer",fontSize:11,fontWeight:600,color:sv?B:TM,padding:"4px 10px",borderRadius:5}}>{sv?"Saved":"Save"}</button>
-              <button onClick={e=>{e.stopPropagation();setNma(a.id);setNmo(true);}} style={{background:"none",border:"none",cursor:"pointer",fontSize:11,fontWeight:600,color:B,padding:0}}>Message</button>
+              <div style={{display:"flex",gap:10,alignItems:"center"}}>
+                <button onClick={e=>{e.stopPropagation();setFollowed(f=>f.includes(a.id)?f.filter(x=>x!==a.id):[...f,a.id]);}} style={{background:"none",border:"none",cursor:"pointer",fontSize:11,fontWeight:600,color:followed.includes(a.id)?TM:B,padding:0}}>{followed.includes(a.id)?"Following":"Follow"}</button>
+                <button onClick={e=>{e.stopPropagation();setNma(a.id);setNmo(true);}} style={{background:"none",border:"none",cursor:"pointer",fontSize:11,fontWeight:600,color:B,padding:0}}>Message</button>
+              </div>
             </div>
           </div>;})}
           {!fil.length&&<p style={{padding:"36px 0",textAlign:"center",color:TL,fontSize:13}}>No athletes match your filters.</p>}
@@ -1826,7 +1870,7 @@ function CoachApp({user=null}){
     <nav className="nav-app">
       {TABS.map(({id,label,Ic:Icon})=>{const a=tab===id,badge=id==="messages"?msg.total:id==="camps"?tReq:0;return <button key={id} className="nav-btn" onClick={()=>{setTab(id);if(id!=="messages")msg.setA(null);if(id!=="camps")setSelCamp(null);}}>
         <div style={{position:"relative",display:"flex",alignItems:"center",justifyContent:"center",width:28,height:a?22:26}}>
-          <Icon active={a} color={a?B:"#b0b8c4"} size={a?19:21}/>
+          <Icon active={a} color={a?B:"var(--nav-icon)"} size={a?19:21}/>
           {badge>0&&<div style={{position:"absolute",top:-2,right:-4,width:13,height:13,borderRadius:"50%",background:"#ef4444",color:W,fontSize:8,fontWeight:800,display:"flex",alignItems:"center",justifyContent:"center",border:`1.5px solid ${W}`}}>{badge}</div>}
         </div>
         {a&&<span className="nav-label" style={{color:B}}>{label}</span>}
@@ -1924,17 +1968,63 @@ function CoachApp({user=null}){
   </div>;
 }
 
+function SignIn({onBack,onSuccess}){
+  const[email,setEmail]=useState("");
+  const[pw,setPw]=useState("");
+  const[err,setErr]=useState("");
+  const[busy,setBusy]=useState(false);
+  const submit=async()=>{
+    if(!email||!pw)return;
+    setBusy(true);setErr("");
+    const{data,error}=await supabase.auth.signInWithPassword({email,password:pw});
+    setBusy(false);
+    if(error){setErr(error.message);}
+    else{const m=data.user.user_metadata;onSuccess(m?.role||"athlete",m||{});}
+  };
+  return <div style={{minHeight:"100vh",background:"#0D0D0D",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"32px 22px",textAlign:"left"}}><style>{CSS}</style>
+    <div style={{width:"100%",maxWidth:360}}>
+      <div style={{textAlign:"center",marginBottom:36}}>
+        <div style={{width:52,height:52,background:B,borderRadius:14,display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 16px",boxShadow:`0 8px 32px ${B}40`}}>
+          <svg width={26} height={26} viewBox="0 0 20 20" fill="none"><path d="M10 2L13 8H19L14 12L16 18L10 14.5L4 18L6 12L1 8H7L10 2Z" fill="white"/></svg>
+        </div>
+        <h1 style={{fontSize:22,fontWeight:800,color:"#f0f0f0",letterSpacing:-.6,margin:0,marginBottom:6}}>Welcome back</h1>
+        <p style={{fontSize:12,color:"#666",margin:0}}>Sign in to your FastTrack account</p>
+      </div>
+      <div style={{background:"#111",border:"1px solid #1a1a1a",borderRadius:10,padding:"24px 20px"}}>
+        <FL label="Email" ch={<FIn type="email" placeholder="you@email.com" value={email} onChange={e=>setEmail(e.target.value)}/>}/>
+        <FL label="Password" ch={<FIn type="password" placeholder="Your password" value={pw} onChange={e=>setPw(e.target.value)} onKeyDown={e=>e.key==="Enter"&&submit()}/>}/>
+        {err&&<p style={{fontSize:12,color:"#ef4444",margin:"0 0 12px",lineHeight:1.4}}>{err}</p>}
+        <Btn ch={busy?"Signing in…":"Sign In"} full dis={busy||!email||!pw} onClick={submit}/>
+      </div>
+      <p style={{fontSize:12,color:"#444",textAlign:"center",marginTop:20}}>Don't have an account? <span style={{color:B,fontWeight:600,cursor:"pointer"}} onClick={onBack}>Get started</span></p>
+    </div>
+  </div>;
+}
+
 export default function Root(){
-  const[screen,setScreen]=useState("role");
+  const[screen,setScreen]=useState("loading");
   const[uData,setUD]=useState(null);
   const[cData,setCD]=useState(null);
+  useEffect(()=>{
+    document.documentElement.setAttribute('data-theme','dark');
+    supabase.auth.getSession().then(({data:{session}})=>{
+      if(session){
+        const m=session.user.user_metadata;
+        if(m?.role==="athlete"){setUD(m);setScreen("athlete-app");}
+        else if(m?.role==="coach"){setCD(m);setScreen("coach-app");}
+        else{setScreen("role");}
+      }else{setScreen("role");}
+    });
+    const{data:{subscription}}=supabase.auth.onAuthStateChange((_ev,session)=>{
+      if(!session){setScreen("role");setUD(null);setCD(null);}
+    });
+    return()=>subscription.unsubscribe();
+  },[]);
   const jump=r=>{if(r==="athlete"){setUD(DA);setScreen("athlete-app");}else{setCD(DC);setScreen("coach-app");}};
   useEffect(()=>{
-    // Prevent zoom — set correct viewport
     let meta=document.querySelector("meta[name=viewport]");
     if(!meta){meta=document.createElement("meta");meta.name="viewport";document.head.appendChild(meta);}
     meta.content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover";
-    // Prevent pinch zoom via touch events
     const noZoom=e=>{if(e.touches&&e.touches.length>1)e.preventDefault();};
     document.addEventListener("touchmove",noZoom,{passive:false});
     document.addEventListener("gesturestart",e=>e.preventDefault());
@@ -1942,13 +2032,15 @@ export default function Root(){
     return()=>document.removeEventListener("touchmove",noZoom);
   },[]);
   const content=
-    screen==="role"?<RoleSelect onSelect={r=>setScreen(`${r}-onboard`)} onJump={jump}/>:
-    screen==="athlete-onboard"?<AthleteOnboard onComplete={d=>{setUD(d);setScreen("athlete-app");}}/>:
-    screen==="coach-onboard"?<CoachOnboard onComplete={d=>{setCD(d);setScreen("coach-app");}}/>:
+    screen==="loading"?<div style={{minHeight:"100vh",background:"#0D0D0D",display:"flex",alignItems:"center",justifyContent:"center"}}><p style={{color:"#555",fontSize:13}}>Loading…</p></div>:
+    screen==="role"?<RoleSelect onSelect={r=>setScreen(`${r}-onboard`)} onJump={jump} onSignIn={()=>setScreen("sign-in")}/>:
+    screen==="sign-in"?<SignIn onBack={()=>setScreen("role")} onSuccess={(role,data)=>{if(role==="athlete"){setUD(data);setScreen("athlete-app");}else{setCD(data);setScreen("coach-app");}}}/>:
+    screen==="athlete-onboard"?<AthleteOnboard onComplete={d=>{setUD(d);setScreen("athlete-app");}} onSignIn={()=>setScreen("sign-in")}/>:
+    screen==="coach-onboard"?<CoachOnboard onComplete={d=>{setCD(d);setScreen("coach-app");}} onSignIn={()=>setScreen("sign-in")}/>:
     screen==="athlete-app"?<AthleteApp user={uData}/>:
     screen==="coach-app"?<CoachApp user={cData}/>:null;
-  return <div style={{background:"#0f172a",minHeight:"100vh",display:"flex",alignItems:"flex-start",justifyContent:"center"}}>
-    <div style={{width:"100%",maxWidth:430,minHeight:"100vh",position:"relative",background:"#f8fafc",boxShadow:"0 0 60px rgba(0,0,0,.4)"}}>
+  return <div style={{background:"#050505",minHeight:"100vh",display:"flex",alignItems:"flex-start",justifyContent:"center"}}>
+    <div style={{width:"100%",maxWidth:430,minHeight:"100vh",position:"relative",background:"#0a0a0a",boxShadow:"0 0 60px rgba(0,0,0,.4)"}}>
       {content}
     </div>
   </div>;

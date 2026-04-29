@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git clone *)",
+      "Bash(git init *)",
+      "Bash(git remote *)",
+      "Bash(git fetch *)",
+      "Bash(npm create *)",
+      "Bash(npm install *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git branch *)",
+      "Bash(git push *)",
+      "Bash(npm run *)",
+      "Bash(netstat -ano)",
+      "Bash(python3 *)",
+      "PowerShell($bytes = [System.IO.File]::ReadAllBytes\\(\"C:\\\\Users\\\\andre\\\\OneDrive\\\\Documents\\\\Fast Track Recruitment\\\\coaches_database.csv\"\\); [Convert]::ToBase64String\\($bytes\\))",
+      "PowerShell(Get-Item *)",
+      "PowerShell(Out-File *)",
+      "mcp__claude_ai_Google_Drive__create_file",
+      "Skill(update-config)",
+      "Bash(npx --yes @supabase/mcp-server-supabase --help)",
+      "mcp__supabase__list_tables",
+      "mcp__supabase__apply_migration",
+      "mcp__supabase__execute_sql",
+      "WebSearch"
+    ]
+  }
+}
