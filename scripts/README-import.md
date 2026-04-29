@@ -1,43 +1,44 @@
-## D2 soccer schools import (Supabase)
+## Soccer program imports (Supabase)
 
-This repo has a one-time import script that loads **NCAA Division II men’s + women’s soccer programs** from Wikipedia and inserts missing schools into the Supabase `schools` table.
-
-## D1 soccer schools import (Supabase)
-
-This repo also includes a script that imports **NCAA Division I men’s + women’s soccer programs** from Wikipedia and:
-- Inserts any missing schools into `schools`
-- Updates existing `schools` rows to mark whether the school has **men’s soccer** and/or **women’s soccer**
-
-Because your current table schema does not have boolean flags, the script marks existence using:
-- `mens_soccer_url` (set to `athletics_url` when available, otherwise a non-empty placeholder)
-- `womens_soccer_url` (same idea)
-
-### 1) Add credentials to `.env.local`
-
-Create or update `.env.local` in the project root:
+Imports fill **`mens_programs`** and **`womens_programs`** (and legacy **`schools`** for NCAA scripts). Use **`.env.local`** with:
 
 ```bash
 SUPABASE_URL="https://YOUR_PROJECT.supabase.co"
 SUPABASE_SERVICE_ROLE_KEY="YOUR_SERVICE_ROLE_KEY"
 ```
 
-Notes:
-- `.env.local` is already gitignored.
-- The service role key bypasses RLS; keep it private.
-
-### 2) Run the import
+Run from the project root:
 
 ```bash
 npm install
-node --env-file=.env.local scripts/import-d2-soccer-schools.mjs
 node --env-file=.env.local scripts/import-d1-soccer-schools.mjs
+node --env-file=.env.local scripts/import-d2-soccer-schools.mjs
 node --env-file=.env.local scripts/import-d3-soccer-schools.mjs
+node --env-file=.env.local scripts/import-naia-soccer.mjs
+node --env-file=.env.local scripts/import-juco-soccer.mjs
 ```
 
-The script:
-- Parses Wikipedia’s D2 **men’s** and **women’s** soccer program tables
-- Merges into a unique school list
-- Inserts into `schools` with columns:
-  - `school_name`, `division`, `conference`, `state`, `athletics_url`, `mens_soccer_url`, `womens_soccer_url`, `notes`
-- Skips duplicates by checking existing `school_name` values first
+### Dedupe (keep longer formal names)
 
+After imports, merge duplicate rows that share the same normalized name + division (e.g. short vs long school name):
+
+```bash
+node --env-file=.env.local scripts/dedupe-programs.mjs
+node --env-file=.env.local scripts/dedupe-programs.mjs --apply
+```
+
+Reports are written to `scripts/_duplicates_mens_programs.json` and `scripts/_duplicates_womens_programs.json` (gitignored).
+
+### Verify counts
+
+```bash
+node --env-file=.env.local scripts/verify-programs.mjs
+```
+
+Compares NCAA D1/D2/D3 to the official NCAA Directory API. NAIA/NJCAA pages may return **403** from some networks (Cloudflare); if so, official NAIA/JUCO counts show as `null` but your DB counts still print — **re-run NAIA/JUCO imports on a normal home/office PC** if needed.
+
+### Sources
+
+- **NCAA D1/D2/D3:** NCAA Directory API (`web3.ncaa.org`)
+- **NAIA:** NAIA Stats (PrestoSports)
+- **JUCO:** NJCAA Stats (PrestoSports)

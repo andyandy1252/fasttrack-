@@ -850,14 +850,18 @@ function AthleteApp({user=null}){
   const[nmSch,setNmSch]=useState(null);
   const[nmTxt,setNmTxt]=useState("");
   const msg=useMsgs(SA);
+  const[gender,setGender]=useState(()=>localStorage.getItem("ft_gender")||"");
   const[schools,setSchools]=useState([]);
   const[schoolsLoading,setSchoolsLoading]=useState(true);
   useEffect(()=>{
-    supabase.from("schools").select("*").order("school_name").then(({data,error})=>{
+    if(!gender){setSchools([]);setSchoolsLoading(false);return;}
+    setSchoolsLoading(true);
+    const table=gender==="man"?"mens_programs":"womens_programs";
+    supabase.from(table).select("*").order("school_name").then(({data,error})=>{
       if(data)setSchools(data.map(s=>({id:s.id,name:s.school_name,div:s.division,conf:normConf(s.conference),state:s.state,athletics_url:s.athletics_url||"",coach:"",email:"",camps:[]})));
       setSchoolsLoading(false);
     });
-  },[]);
+  },[gender]);
   const notify=m=>{setNotif(m);setTimeout(()=>setNotif(null),3e3);};
   // Auto-advance: when athlete opens a thread where coach has replied → move to Replied
   // When athlete opens any thread → move to Viewed (coach opened email sim)
@@ -917,6 +921,31 @@ function AthleteApp({user=null}){
 
   return <div style={{display:"flex",flexDirection:"column",height:"100vh",background:GR,overflow:"hidden",textAlign:"left"}}>
     <style>{CSS}</style>
+    {!gender&&<div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.55)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:9999,padding:16}}>
+      <div style={{width:"min(520px, 100%)",background:W,border:`1px solid ${BD}`,borderRadius:14,padding:18,boxShadow:"0 24px 70px rgba(0,0,0,.25)"}}>
+        <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:10}}>
+          <Logo sz={26} purple/>
+          <div>
+            <div style={{fontWeight:900,color:T,fontSize:16,letterSpacing:-.3}}>Choose your program list</div>
+            <div style={{color:TL,fontSize:12,marginTop:2}}>This filters schools by men’s vs women’s soccer programs.</div>
+          </div>
+        </div>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+          <button onClick={()=>{localStorage.setItem('ft_gender','man');setGender('man');}} style={{border:`1px solid ${BD}`,background:GR,borderRadius:12,padding:"12px 12px",cursor:"pointer",textAlign:"left"}}>
+            <div style={{fontWeight:800,color:T}}>Men</div>
+            <div style={{fontSize:12,color:TL,marginTop:2}}>Show mens_programs</div>
+          </button>
+          <button onClick={()=>{localStorage.setItem('ft_gender','woman');setGender('woman');}} style={{border:`1px solid ${BD}`,background:GR,borderRadius:12,padding:"12px 12px",cursor:"pointer",textAlign:"left"}}>
+            <div style={{fontWeight:800,color:T}}>Women</div>
+            <div style={{fontSize:12,color:TL,marginTop:2}}>Show womens_programs</div>
+          </button>
+        </div>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginTop:12}}>
+          <button onClick={()=>{localStorage.removeItem('ft_gender');setGender('');}} style={{background:"none",border:"none",color:TM,fontWeight:700,fontSize:12,cursor:"pointer",padding:0}}>Reset</button>
+          <div style={{fontSize:11,color:TL}}>You can change this later by clearing site storage.</div>
+        </div>
+      </div>
+    </div>}
     {/* TOP BAR */}
     <div style={{background:W,borderBottom:`1px solid ${BD}`,padding:"0 20px",height:56,display:"flex",alignItems:"center",justifyContent:"space-between",flexShrink:0}}>
       {inTV?<button onClick={()=>msg.setA(null)} style={{background:"none",border:"none",cursor:"pointer",display:"flex",alignItems:"center",gap:6,padding:0}}><Ic.back size={18} color={B}/><span style={{fontSize:12,fontWeight:600,color:B}}>Messages</span></button>:<Logo sz={22}/>}

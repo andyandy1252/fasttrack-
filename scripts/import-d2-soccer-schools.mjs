@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { normalizeSchoolName } from "./lib/normalizeSchoolName.mjs";
 
 const NCAA_D2_MEN =
   "https://web3.ncaa.org/directory/api/directory/memberList?type=12&division=II&sportCode=MSO";
@@ -32,6 +33,8 @@ async function fetchD2SoccerSchools() {
 
   const menSet = new Set();
   const womenSet = new Set();
+  const menPrograms = [];
+  const womenPrograms = [];
 
   const merged = new Map();
   for (const row of men) {
@@ -55,6 +58,19 @@ async function fetchD2SoccerSchools() {
       notes: "NCAA Directory DII men's soccer institutions",
       _hasMen: true,
       _hasWomen: false,
+    });
+
+    menPrograms.push({
+      school_name: school,
+      school_name_normalized: normalizeSchoolName(school),
+      division: "D2",
+      conference,
+      state: state || null,
+      athletics_url: athleticWebUrl || null,
+      soccer_url: null,
+      source: "NCAA Directory memberList API",
+      source_updated_at: new Date().toISOString(),
+      notes: "Imported from NCAA Directory (DII men's soccer)",
     });
   }
 
@@ -92,13 +108,38 @@ async function fetchD2SoccerSchools() {
         _hasWomen: true,
       });
     }
+
+    womenPrograms.push({
+      school_name: school,
+      school_name_normalized: normalizeSchoolName(school),
+      division: "D2",
+      conference,
+      state: state || null,
+      athletics_url: athleticWebUrl || null,
+      soccer_url: null,
+      source: "NCAA Directory memberList API",
+      source_updated_at: new Date().toISOString(),
+      notes: "Imported from NCAA Directory (DII women's soccer)",
+    });
   }
+
+  const pickBest = (rows) => {
+    const byNorm = new Map();
+    for (const r of rows) {
+      if (!r.school_name_normalized) continue;
+      const ex = byNorm.get(r.school_name_normalized);
+      if (!ex || r.school_name.length > ex.school_name.length) byNorm.set(r.school_name_normalized, r);
+    }
+    return [...byNorm.values()];
+  };
 
   return {
     menCount: men.length,
     womenCount: women.length,
     menSet,
     womenSet,
+    menPrograms: pickBest(menPrograms),
+    womenPrograms: pickBest(womenPrograms),
     schools: [...merged.values()].map(({ _hasMen, _hasWomen, ...row }) => row),
   };
 }
@@ -188,7 +229,7 @@ async function main() {
   });
 
   console.log("Fetching D2 soccer institutions (NCAA Directory)...");
-  const { menCount, womenCount, menSet, womenSet, schools } =
+  const { menCount, womenCount, menSet, womenSet, menPrograms, womenPrograms, schools } =
     await fetchD2SoccerSchools();
   console.log(`Men institutions returned: ${menCount}`);
   console.log(`Women institutions returned: ${womenCount}`);
@@ -306,6 +347,17 @@ async function main() {
   if (womenErr) throw womenErr;
   console.log("D2 counts in Supabase after import:");
   console.log(JSON.stringify({ mens: menTotal, womens: womenTotal }, null, 2));
+
+  console.log("Upserting D2 programs into mens_programs / womens_programs...");
+  const { error: upMenErr } = await supabase
+    .from("mens_programs")
+    .upsert(menPrograms, { onConflict: "school_name_normalized,division" });
+  if (upMenErr) throw upMenErr;
+  const { error: upWomenErr } = await supabase
+    .from("womens_programs")
+    .upsert(womenPrograms, { onConflict: "school_name_normalized,division" });
+  if (upWomenErr) throw upWomenErr;
+
   console.log("Import complete.");
 }
 
