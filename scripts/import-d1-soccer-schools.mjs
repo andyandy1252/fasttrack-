@@ -1,9 +1,9 @@
 import { createClient } from "@supabase/supabase-js";
 
-const WIKI_D1_MEN_RAW =
-  "https://en.wikipedia.org/w/index.php?title=List_of_NCAA_Division_I_men%27s_soccer_programs&action=raw";
-const WIKI_D1_WOMEN_RAW =
-  "https://en.wikipedia.org/w/index.php?title=List_of_NCAA_Division_I_women%27s_soccer_programs&action=raw";
+const NCAA_D1_MEN =
+  "https://web3.ncaa.org/directory/api/directory/memberList?type=12&division=I&sportCode=MSO";
+const NCAA_D1_WOMEN =
+  "https://web3.ncaa.org/directory/api/directory/memberList?type=12&division=I&sportCode=WSO";
 
 function requiredEnv(name) {
   const v = process.env[name];
@@ -11,247 +11,84 @@ function requiredEnv(name) {
   return v;
 }
 
-const US_STATE_ABBR = {
-  Alabama: "AL",
-  Alaska: "AK",
-  Arizona: "AZ",
-  Arkansas: "AR",
-  California: "CA",
-  Colorado: "CO",
-  Connecticut: "CT",
-  Delaware: "DE",
-  "District of Columbia": "DC",
-  Florida: "FL",
-  Georgia: "GA",
-  Hawaii: "HI",
-  Idaho: "ID",
-  Illinois: "IL",
-  Indiana: "IN",
-  Iowa: "IA",
-  Kansas: "KS",
-  Kentucky: "KY",
-  Louisiana: "LA",
-  Maine: "ME",
-  Maryland: "MD",
-  Massachusetts: "MA",
-  Michigan: "MI",
-  Minnesota: "MN",
-  Mississippi: "MS",
-  Missouri: "MO",
-  Montana: "MT",
-  Nebraska: "NE",
-  Nevada: "NV",
-  "New Hampshire": "NH",
-  "New Jersey": "NJ",
-  "New Mexico": "NM",
-  "New York": "NY",
-  "North Carolina": "NC",
-  "North Dakota": "ND",
-  Ohio: "OH",
-  Oklahoma: "OK",
-  Oregon: "OR",
-  Pennsylvania: "PA",
-  "Rhode Island": "RI",
-  "South Carolina": "SC",
-  "South Dakota": "SD",
-  Tennessee: "TN",
-  Texas: "TX",
-  Utah: "UT",
-  Vermont: "VT",
-  Virginia: "VA",
-  Washington: "WA",
-  "West Virginia": "WV",
-  Wisconsin: "WI",
-  Wyoming: "WY",
-  "Puerto Rico": "PR",
-};
-
-function normalizeStateOrProvince(v) {
-  const s = (v || "").trim();
-  if (!s) return "";
-  return US_STATE_ABBR[s] || s;
-}
-
-function stripWikiMarkup(s) {
-  if (!s) return "";
-  let out = String(s).trim();
-
-  out = out.replace(/<ref[^>]*>[\s\S]*?<\/ref>/g, "");
-  out = out.replace(/<ref[^\/]*\/>/g, "");
-  out = out.replace(/\{\{efn\|[\s\S]*?\}\}/g, "");
-
-  // {{sort|...|...}} -> last param
-  out = out.replace(/\{\{sort\|[^|]+\|([\s\S]+?)\}\}/g, "$1");
-
-  // [[Target|Display]] or [[Target]]
-  out = out.replace(/\[\[([^\]|]+)\|([^\]]+)\]\]/g, "$2");
-  out = out.replace(/\[\[([^\]]+)\]\]/g, "$1");
-
-  // ''italics/bold''
-  out = out.replace(/''+/g, "");
-
-  // HTML entities and leftover tags
-  out = out.replace(/&amp;/g, "&");
-  out = out.replace(/<br\s*\/?>/gi, " ");
-  out = out.replace(/<[^>]+>/g, "");
-
-  // remove parenthetical abbreviations like "(Albany)" etc.
-  out = out.replace(/\s*\([^)]*\)\s*/g, " ");
-
-  return out.replace(/\s+/g, " ").trim();
-}
-
-function parseWikitableRows(wikitext) {
-  const lines = wikitext.split(/\r?\n/);
-  const tables = [];
-
-  let inWikitable = false;
-  let rows = [];
-  let current = [];
-
-  const flushRow = () => {
-    if (current.length) {
-      rows.push(current);
-      current = [];
-    }
-  };
-
-  const flushTable = () => {
-    flushRow();
-    if (rows.length) tables.push(rows);
-    rows = [];
-  };
-
-  for (const raw of lines) {
-    const line = raw.trimEnd();
-
-    if (line.startsWith("{|") && line.includes("wikitable")) {
-      inWikitable = true;
-      continue;
-    }
-    if (inWikitable && line.startsWith("|}")) {
-      inWikitable = false;
-      flushTable();
-      continue;
-    }
-    if (!inWikitable) continue;
-
-    if (line.startsWith("|-")) {
-      flushRow();
-      continue;
-    }
-
-    if (line.startsWith("!")) continue;
-
-    if (line.startsWith("|")) {
-      const cell = line.replace(/^\|\s?/, "");
-      current.push(cell);
-    }
-  }
-  flushTable();
-  return tables;
-}
-
-function parseD1Programs(wikitext, gender) {
-  const tables = parseWikitableRows(wikitext);
-
-  // Find the "Current Division I schools" table by looking for a row that contains a "Conference" cell.
-  // We'll then parse each row and map columns by gender-specific layout.
-  const table = tables.find((t) =>
-    t.some((row) => row.some((c) => String(c).includes("Conference")))
-  );
-  if (!table) return [];
-
-  const programs = [];
-
-  for (const row of table) {
-    // Men table columns: Institution, Nickname, Location, State, Type, Conference
-    // Women table columns: Institution, Location, State, Type, Nickname, Conference
-    const minCols = 6;
-    if (row.length < minCols) continue;
-
-    let institutionCell;
-    let stateCell;
-    let confCell;
-
-    if (gender === "men") {
-      institutionCell = row[0];
-      stateCell = row[3];
-      confCell = row[5];
-    } else {
-      institutionCell = row[0];
-      stateCell = row[2];
-      confCell = row[5];
-    }
-
-    const school = stripWikiMarkup(institutionCell);
-    const state = normalizeStateOrProvince(stripWikiMarkup(stateCell));
-    const conference = stripWikiMarkup(confCell);
-
-    if (!school) continue;
-    programs.push({ school, state, conference });
-  }
-
-  // De-dupe by school
-  const bySchool = new Map();
-  for (const p of programs) {
-    if (!bySchool.has(p.school)) bySchool.set(p.school, p);
-  }
-  return [...bySchool.values()];
-}
-
 async function fetchText(url) {
   const res = await fetch(url, {
     headers: {
-      "User-Agent":
-        "fast-track-recruitment-import/1.0 (contact: local script)",
+      "User-Agent": "fast-track-recruitment-import/1.0 (contact: local script)",
+      Accept: "application/json",
     },
   });
   if (!res.ok) throw new Error(`Fetch failed ${res.status} for ${url}`);
-  return await res.text();
+  const data = await res.json();
+  if (!Array.isArray(data)) throw new Error(`Unexpected response (not array) for ${url}`);
+  return data;
 }
 
 async function fetchD1SoccerSchools() {
-  const [menRaw, womenRaw] = await Promise.all([
-    fetchText(WIKI_D1_MEN_RAW),
-    fetchText(WIKI_D1_WOMEN_RAW),
+  const [men, women] = await Promise.all([
+    fetchText(NCAA_D1_MEN),
+    fetchText(NCAA_D1_WOMEN),
   ]);
-  const menPrograms = parseD1Programs(menRaw, "men");
-  const womenPrograms = parseD1Programs(womenRaw, "women");
+
+  const menSet = new Set();
+  const womenSet = new Set();
 
   const merged = new Map();
-  for (const p of menPrograms) {
-    merged.set(p.school, {
-      school_name: p.school,
+
+  for (const row of men) {
+    const school = (row?.nameOfficial || "").trim();
+    if (!school) continue;
+    menSet.add(school);
+    const state = (row?.memberOrgAddress?.state || "").trim();
+    const conference = (row?.conferenceName || "").trim() || "Independent";
+    const athleticWebUrl = (row?.athleticWebUrl || "").trim();
+
+    merged.set(school, {
+      school_name: school,
       division: "D1",
-      conference: p.conference || "",
-      state: p.state || "",
-      athletics_url: "",
-      mens_soccer_url: "__HAS_MENS_SOCCER__",
+      mens_division: "D1",
+      womens_division: null,
+      conference,
+      state,
+      athletics_url: athleticWebUrl,
+      mens_soccer_url: athleticWebUrl || "__HAS_MENS_SOCCER__",
       womens_soccer_url: null,
-      notes: "Wikipedia D1 men's soccer programs",
+      notes: "NCAA Directory DI men's soccer institutions",
       _hasMen: true,
       _hasWomen: false,
     });
   }
-  for (const p of womenPrograms) {
-    const ex = merged.get(p.school);
+
+  for (const row of women) {
+    const school = (row?.nameOfficial || "").trim();
+    if (!school) continue;
+    womenSet.add(school);
+    const state = (row?.memberOrgAddress?.state || "").trim();
+    const conference = (row?.conferenceName || "").trim() || "Independent";
+    const athleticWebUrl = (row?.athleticWebUrl || "").trim();
+
+    const ex = merged.get(school);
     if (ex) {
       ex._hasWomen = true;
-      ex.womens_soccer_url = "__HAS_WOMENS_SOCCER__";
-      if (!ex.conference && p.conference) ex.conference = p.conference;
-      if (!ex.state && p.state) ex.state = p.state;
-      ex.notes = "Wikipedia D1 men's & women's soccer programs";
+      ex.womens_soccer_url = athleticWebUrl || "__HAS_WOMENS_SOCCER__";
+      ex.womens_division = "D1";
+      if (!ex.athletics_url && athleticWebUrl) ex.athletics_url = athleticWebUrl;
+      if ((!ex.conference || ex.conference === "Independent") && conference)
+        ex.conference = conference;
+      if (!ex.state && state) ex.state = state;
+      ex.notes = "NCAA Directory DI men's & women's soccer institutions";
     } else {
-      merged.set(p.school, {
-        school_name: p.school,
+      merged.set(school, {
+        school_name: school,
         division: "D1",
-        conference: p.conference || "",
-        state: p.state || "",
-        athletics_url: "",
+        mens_division: null,
+        womens_division: "D1",
+        conference,
+        state,
+        athletics_url: athleticWebUrl,
         mens_soccer_url: null,
-        womens_soccer_url: "__HAS_WOMENS_SOCCER__",
-        notes: "Wikipedia D1 women's soccer programs",
+        womens_soccer_url: athleticWebUrl || "__HAS_WOMENS_SOCCER__",
+        notes: "NCAA Directory DI women's soccer institutions",
         _hasMen: false,
         _hasWomen: true,
       });
@@ -259,8 +96,10 @@ async function fetchD1SoccerSchools() {
   }
 
   return {
-    menCount: menPrograms.length,
-    womenCount: womenPrograms.length,
+    menCount: men.length,
+    womenCount: women.length,
+    menSet,
+    womenSet,
     schools: [...merged.values()].map(({ _hasMen, _hasWomen, ...row }) => row),
   };
 }
@@ -274,7 +113,7 @@ async function fetchExistingSchools(supabase) {
     const { data, error } = await supabase
       .from("schools")
       .select(
-        "id,school_name,division,conference,state,athletics_url,mens_soccer_url,womens_soccer_url,notes"
+        "id,school_name,division,mens_division,womens_division,conference,state,athletics_url,mens_soccer_url,womens_soccer_url,notes"
       )
       .range(from, to);
     if (error) throw error;
@@ -323,6 +162,26 @@ async function updateInBatches(supabase, rows, batchSize = 200) {
   }
 }
 
+async function fetchDivisionRows(supabase, division) {
+  const rows = [];
+  let from = 0;
+  const pageSize = 1000;
+  for (;;) {
+    const to = from + pageSize - 1;
+    const { data, error } = await supabase
+      .from("schools")
+      .select("school_name,mens_division,womens_division,mens_soccer_url,womens_soccer_url")
+      .eq("division", division)
+      .range(from, to);
+    if (error) throw error;
+    if (!data || data.length === 0) break;
+    rows.push(...data);
+    if (data.length < pageSize) break;
+    from += pageSize;
+  }
+  return rows;
+}
+
 async function main() {
   const supabaseUrl = requiredEnv("SUPABASE_URL");
   const serviceRoleKey = requiredEnv("SUPABASE_SERVICE_ROLE_KEY");
@@ -330,8 +189,9 @@ async function main() {
     auth: { persistSession: false },
   });
 
-  console.log("Fetching D1 soccer programs (Wikipedia)...");
-  const { menCount, womenCount, schools } = await fetchD1SoccerSchools();
+  console.log("Fetching D1 soccer institutions (NCAA Directory)...");
+  const { menCount, womenCount, menSet, womenSet, schools } =
+    await fetchD1SoccerSchools();
   console.log(`Men programs parsed: ${menCount}`);
   console.log(`Women programs parsed: ${womenCount}`);
   console.log(`Unique schools in merged set: ${schools.length}`);
@@ -346,25 +206,17 @@ async function main() {
   for (const row of schools) {
     const ex = existing.get(row.school_name);
     if (!ex) {
-      // Insert as-is (ensure nulls instead of placeholders)
-      toInsert.push({
-        ...row,
-        mens_soccer_url:
-          row.mens_soccer_url === "__HAS_MENS_SOCCER__"
-            ? row.athletics_url || "__HAS_MENS_SOCCER__"
-            : row.mens_soccer_url,
-        womens_soccer_url:
-          row.womens_soccer_url === "__HAS_WOMENS_SOCCER__"
-            ? row.athletics_url || "__HAS_WOMENS_SOCCER__"
-            : row.womens_soccer_url,
-      });
+      // Insert as-is
+      toInsert.push(row);
       continue;
     }
 
     // Only patch fields we can improve; never blank out existing data.
     const patch = {
       school_name: row.school_name,
-      division: ex.division || row.division,
+      division: row.division,
+      mens_division: row.mens_division ?? ex.mens_division,
+      womens_division: row.womens_division ?? ex.womens_division,
       conference: coalescePreferNonEmpty(ex.conference, row.conference),
       state: coalescePreferNonEmpty(ex.state, row.state),
       athletics_url: coalescePreferNonEmpty(ex.athletics_url, row.athletics_url),
@@ -373,20 +225,25 @@ async function main() {
       womens_soccer_url: ex.womens_soccer_url,
     };
 
-    const hasMen = row.mens_soccer_url === "__HAS_MENS_SOCCER__";
-    const hasWomen = row.womens_soccer_url === "__HAS_WOMENS_SOCCER__";
+    const hasMen = !!(row.mens_soccer_url && String(row.mens_soccer_url).trim());
+    const hasWomen = !!(
+      row.womens_soccer_url && String(row.womens_soccer_url).trim()
+    );
 
     if (hasMen && (!patch.mens_soccer_url || patch.mens_soccer_url === "")) {
-      patch.mens_soccer_url = patch.athletics_url || "__HAS_MENS_SOCCER__";
+      patch.mens_soccer_url = row.mens_soccer_url;
     }
     if (
       hasWomen &&
       (!patch.womens_soccer_url || patch.womens_soccer_url === "")
     ) {
-      patch.womens_soccer_url = patch.athletics_url || "__HAS_WOMENS_SOCCER__";
+      patch.womens_soccer_url = row.womens_soccer_url;
     }
 
     const changed =
+      patch.division !== ex.division ||
+      patch.mens_division !== ex.mens_division ||
+      patch.womens_division !== ex.womens_division ||
       patch.conference !== ex.conference ||
       patch.state !== ex.state ||
       patch.athletics_url !== ex.athletics_url ||
@@ -412,19 +269,44 @@ async function main() {
     await updateInBatches(supabase, toUpdate, 200);
   }
 
+  // Reconcile: clear D1 gender flags for schools that do NOT sponsor that sport per NCAA directory.
+  // This fixes over-counting caused by earlier imports that set placeholders broadly.
+  console.log("Reconciling D1 men/women divisions to match NCAA Directory...");
+  const existingD1 = await fetchDivisionRows(supabase, "D1");
+  const clearMen = [];
+  const clearWomen = [];
+  for (const r of existingD1) {
+    const name = r?.school_name;
+    if (!name) continue;
+    if (r.mens_division === "D1" && !menSet.has(name)) {
+      clearMen.push({ school_name: name, mens_division: null, mens_soccer_url: null });
+    }
+    if (r.womens_division === "D1" && !womenSet.has(name)) {
+      clearWomen.push({
+        school_name: name,
+        womens_division: null,
+        womens_soccer_url: null,
+      });
+    }
+  }
+  if (clearMen.length) {
+    console.log(`Clearing mens_division for ${clearMen.length} schools...`);
+    await updateInBatches(supabase, clearMen, 200);
+  }
+  if (clearWomen.length) {
+    console.log(`Clearing womens_division for ${clearWomen.length} schools...`);
+    await updateInBatches(supabase, clearWomen, 200);
+  }
+
   const { count: menTotal, error: menErr } = await supabase
     .from("schools")
     .select("id", { count: "exact", head: true })
-    .eq("division", "D1")
-    .not("mens_soccer_url", "is", null)
-    .neq("mens_soccer_url", "");
+    .eq("mens_division", "D1");
   if (menErr) throw menErr;
   const { count: womenTotal, error: womenErr } = await supabase
     .from("schools")
     .select("id", { count: "exact", head: true })
-    .eq("division", "D1")
-    .not("womens_soccer_url", "is", null)
-    .neq("womens_soccer_url", "");
+    .eq("womens_division", "D1");
   if (womenErr) throw womenErr;
 
   console.log("D1 counts in Supabase after import:");

@@ -49,16 +49,22 @@ async function fetchD3SoccerSchools() {
     fetchJson(NCAA_D3_WOMEN),
   ]);
 
+  const menSet = new Set();
+  const womenSet = new Set();
+
   const merged = new Map();
 
   for (const row of men) {
     const school = normalizeSchoolName(row?.nameOfficial);
     if (!school) continue;
+    menSet.add(school);
     const state = toStateAbbr(row?.memberOrgAddress?.state);
     const conference = normalizeConferenceName(row?.conferenceName);
     merged.set(school, {
       school_name: school,
       division: "D3",
+      mens_division: "D3",
+      womens_division: null,
       conference,
       state,
       athletics_url: row?.athleticWebUrl || "",
@@ -73,6 +79,7 @@ async function fetchD3SoccerSchools() {
   for (const row of women) {
     const school = normalizeSchoolName(row?.nameOfficial);
     if (!school) continue;
+    womenSet.add(school);
     const state = toStateAbbr(row?.memberOrgAddress?.state);
     const conference = normalizeConferenceName(row?.conferenceName);
     const athleticWebUrl = row?.athleticWebUrl || "";
@@ -81,6 +88,7 @@ async function fetchD3SoccerSchools() {
     if (ex) {
       ex._hasWomen = true;
       ex.womens_soccer_url = athleticWebUrl || "__HAS_WOMENS_SOCCER__";
+      ex.womens_division = "D3";
       // Prefer non-empty
       if (!ex.athletics_url && athleticWebUrl) ex.athletics_url = athleticWebUrl;
       if ((!ex.conference || ex.conference === "Independent") && conference)
@@ -91,6 +99,8 @@ async function fetchD3SoccerSchools() {
       merged.set(school, {
         school_name: school,
         division: "D3",
+        mens_division: null,
+        womens_division: "D3",
         conference,
         state,
         athletics_url: athleticWebUrl,
@@ -106,6 +116,8 @@ async function fetchD3SoccerSchools() {
   return {
     menCount: men.length,
     womenCount: women.length,
+    menSet,
+    womenSet,
     schools: [...merged.values()].map(({ _hasMen, _hasWomen, ...row }) => row),
   };
 }
@@ -119,7 +131,7 @@ async function fetchExistingSchools(supabase) {
     const { data, error } = await supabase
       .from("schools")
       .select(
-        "id,school_name,division,conference,state,athletics_url,mens_soccer_url,womens_soccer_url,notes"
+        "id,school_name,division,mens_division,womens_division,conference,state,athletics_url,mens_soccer_url,womens_soccer_url,notes"
       )
       .range(from, to);
     if (error) throw error;
@@ -197,6 +209,8 @@ async function main() {
     const patch = {
       school_name: row.school_name,
       division: ex.division || row.division,
+      mens_division: row.mens_division ?? ex.mens_division,
+      womens_division: row.womens_division ?? ex.womens_division,
       conference: coalescePreferNonEmpty(ex.conference, row.conference),
       state: coalescePreferNonEmpty(ex.state, row.state),
       athletics_url: coalescePreferNonEmpty(ex.athletics_url, row.athletics_url),
@@ -219,6 +233,8 @@ async function main() {
     }
 
     const changed =
+      patch.mens_division !== ex.mens_division ||
+      patch.womens_division !== ex.womens_division ||
       patch.conference !== ex.conference ||
       patch.state !== ex.state ||
       patch.athletics_url !== ex.athletics_url ||
@@ -249,15 +265,11 @@ async function main() {
       supabase
         .from("schools")
         .select("id", { count: "exact", head: true })
-        .eq("division", "D3")
-        .not("mens_soccer_url", "is", null)
-        .neq("mens_soccer_url", ""),
+        .eq("mens_division", "D3"),
       supabase
         .from("schools")
         .select("id", { count: "exact", head: true })
-        .eq("division", "D3")
-        .not("womens_soccer_url", "is", null)
-        .neq("womens_soccer_url", ""),
+        .eq("womens_division", "D3"),
     ]);
   if (menErr) throw menErr;
   if (womenErr) throw womenErr;
