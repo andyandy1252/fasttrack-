@@ -112,7 +112,7 @@ const FILM_POSTS=[
   {id:6,title:"Court Vision — Assist Reel",desc:"12 assists, 1 turnover — best passing sequences of the season.",type:"Passing",date:"Jan 30, 2026",views:156,likes:24,duration:"1:20",thumb:"#2563eb",featured:false},
 ];
 
-const DA={first:"Andrew",last:"Johnson",email:"andrew@email.com",sport:"Soccer",positions:["Center Back (CB)"],gradYear:"2027",school:"Lincoln High School",state:"NY",height:'5\'10"',weight:"170 lbs",gpa:"3.8",intl:false,country:"United States",club:"",academy:"",eligibilityStatus:"",satScore:"",toefl:""};
+const DA={first:"Andrew",last:"Johnson",email:"andrew@email.com",birthdate:"2008-03-15",phone:"5551234567",gender:"Male",sport:"Soccer",positions:["Center Back (CB)"],gradYear:"2027",school:"Lincoln High School",state:"NY",height:'5\'10"',weight:"170 lbs",gpa:"3.8",intl:false,country:"United States",club:"",academy:"",preferredDivision:"No Preference",ncaaEligibilityStatus:"Not Started",toefl:""};
 const DC={first:"Kyle",last:"Neptune",email:"neptune@fordham.edu",school:"Fordham University",div:"D1",conf:"Atlantic 10",sport:"Basketball",role:"Head Coach"};
 
 // SVGs
@@ -148,19 +148,20 @@ const Ic={
 function Btn({ch,onClick,v="p",ac=B,dis=false,full=false,sm=false,sx={}}){
   const ah=ac===B?BH:PUH,al=ac===B?BL:PUL;
   const b={cursor:dis?"not-allowed":"pointer",fontWeight:700,fontSize:sm?11.5:13.5,borderRadius:8,padding:sm?"6px 14px":"11px 20px",border:"none",opacity:dis?.3:1,width:full?"100%":undefined,transition:"all .12s",letterSpacing:0,...sx};
-  if(v==="p") return <button disabled={dis} onClick={onClick} style={{...b,background:ac,color:W,boxShadow:dis?"none":`0 1px 3px ${ac}40`}}>{ch}</button>;
+  const shP=dis?"none":(b.boxShadow??`0 1px 3px ${ac}40`);
+  if(v==="p") return <button disabled={dis} onClick={onClick} style={{...b,background:ac,color:W,boxShadow:shP}}>{ch}</button>;
   if(v==="o") return <button disabled={dis} onClick={onClick} style={{...b,background:"transparent",color:ac,border:`1.5px solid ${ac}`}}>{ch}</button>;
   return <button disabled={dis} onClick={onClick} style={{...b,background:GR,color:TM,border:`1px solid ${BD}`}}>{ch}</button>;
 }
 const Pill=({ch,color=B,bg=BL})=><span style={{display:"inline-flex",fontSize:10,fontWeight:700,padding:"3px 8px",borderRadius:5,color,background:bg,letterSpacing:.3,whiteSpace:"nowrap"}}>{ch}</span>;
 const DRow=({label,value,last})=><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"11px 0",borderBottom:last?"none":`1px solid ${BD}`}}><span style={{fontSize:12,color:TM}}>{label}</span><span style={{fontSize:12,fontWeight:700,color:T}}>{value}</span></div>;
 const KPI=({value,label,color=B})=><div style={{flex:1,textAlign:"center",padding:"8px 4px"}}><div style={{fontSize:18,fontWeight:700,color:T,lineHeight:1,letterSpacing:-.5}}>{value}</div><div style={{fontSize:9,color:TL,fontWeight:500,marginTop:3,textTransform:"uppercase",letterSpacing:.4}}>{label}</div></div>;
-function FIn({ac=B,...p}){return <input {...p} style={{width:"100%",padding:"12px 14px",border:`1.5px solid ${BD}`,borderRadius:10,fontSize:14,color:T,background:W,outline:"none",transition:"border-color .15s",...p.style}} onFocus={e=>e.target.style.borderColor=ac} onBlur={e=>e.target.style.borderColor=BD}/>;}
+function FIn({ac=B,error=false,...p}){const bc=error?"#ef4444":BD;return <input {...p} style={{width:"100%",padding:"12px 14px",border:`1.5px solid ${bc}`,borderRadius:10,fontSize:14,color:T,background:W,outline:"none",transition:"border-color .15s",...p.style}} onFocus={e=>{p.onFocus?.(e);e.target.style.borderColor=error?"#ef4444":ac}} onBlur={e=>{p.onBlur?.(e);e.target.style.borderColor=error?"#ef4444":BD}}/>;}
 function FSel({ch,ac=B,...p}){return <select {...p} style={{width:"100%",padding:"12px 14px",border:`1.5px solid ${BD}`,borderRadius:10,fontSize:14,color:T,background:W,outline:"none",...p.style}}>{ch}</select>;}
 function FL({label,hint,ch}){return <div style={{marginBottom:16}}><div style={{fontSize:12,fontWeight:600,color:T,marginBottom:8}}>{label}{hint&&<span style={{fontWeight:400,color:TL,marginLeft:6}}>{hint}</span>}</div>{ch}</div>;}
 function Dots({total,cur,ac=B}){return <div style={{display:"flex",gap:5,justifyContent:"center",marginBottom:28}}>{Array.from({length:total}).map((_,i)=><div key={i} style={{width:i===cur?20:5,height:5,borderRadius:3,background:i===cur?ac:BD,transition:"all .3s ease"}}/>)}</div>;}
 function Logo({sz=24,purple=false,light=false}){const c=purple?PU:B;const tc=light?W:T;return <div style={{display:"flex",alignItems:"center",gap:8}}><div style={{width:sz,height:sz,borderRadius:sz*.22,background:c,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}><svg width={sz*.56} height={sz*.56} viewBox="0 0 20 20" fill="none"><rect x="3" y="4" width="7" height="2.5" rx="1" fill="white"/><rect x="3" y="4" width="2.5" height="12" rx="1" fill="white"/><rect x="3" y="9" width="5.5" height="2.5" rx="1" fill="white"/><rect x="11" y="4" width="9" height="2.5" rx="1" fill="white"/><rect x="13.75" y="4" width="2.5" height="12" rx="1" fill="white"/></svg></div><span style={{fontWeight:800,fontSize:sz*.8,color:tc,letterSpacing:-.6,lineHeight:1}}><span style={{color:tc}}>Fast</span><span style={{color:c}}>Track</span></span></div>;}
-function Sheet({open,onClose,title,sub,ch}){if(!open)return null;return <div onClick={e=>e.target===e.currentTarget&&onClose()} style={{position:"fixed",inset:0,background:"rgba(17,24,39,.5)",zIndex:300,display:"flex",alignItems:"flex-end",backdropFilter:"blur(6px)"}}><div style={{background:W,borderRadius:"20px 20px 0 0",width:"100%",maxHeight:"91vh",overflowY:"auto",boxShadow:"0 -4px 32px rgba(0,0,0,.12)"}}><div style={{width:36,height:4,background:BD,borderRadius:2,margin:"12px auto 0"}}/>{(title||sub)&&<div style={{padding:"16px 20px 12px",borderBottom:`1px solid ${BD}`}}>{title&&<div style={{fontSize:14,fontWeight:700,color:T,letterSpacing:-.3}}>{title}</div>}{sub&&<div style={{fontSize:12,color:TL,marginTop:3}}>{sub}</div>}</div>}<div style={{padding:(title||sub)?"16px 20px 40px":"20px 20px 40px"}}>{ch}</div></div></div>;}
+function Sheet({open,onClose,title,sub,ch}){if(!open)return null;return <div onClick={e=>e.target===e.currentTarget&&onClose()} style={{position:"fixed",inset:0,background:"rgba(17,24,39,.5)",zIndex:300,display:"flex",alignItems:"flex-end",backdropFilter:"blur(6px)"}}><div style={{background:W,borderRadius:"20px 20px 0 0",width:"100%",maxWidth:430,margin:"0 auto",maxHeight:"91vh",overflowY:"auto",boxShadow:"0 -4px 32px rgba(0,0,0,.12)"}}><div style={{width:36,height:4,background:BD,borderRadius:2,margin:"12px auto 0"}}/>{(title||sub)&&<div style={{padding:"16px 20px 12px",borderBottom:`1px solid ${BD}`}}>{title&&<div style={{fontSize:14,fontWeight:700,color:T,letterSpacing:-.3}}>{title}</div>}{sub&&<div style={{fontSize:12,color:TL,marginTop:3}}>{sub}</div>}</div>}<div style={{padding:(title||sub)?"16px 20px 40px":"20px 20px 40px"}}>{ch}</div></div></div>;}
 function FilterPill({label,value,options,onChange,ac=B}){
   const[open,setOpen]=useState(false);
   const active=value!=="All";
@@ -416,87 +417,199 @@ function RoleSelect({onSelect,onJump,onSignIn}){
   </div>;
 }
 
+const FT_ATHLETE_ONBOARD_DRAFT="ft_athlete_onboard_draft";
+const ATHLETE_ONBOARD_DEFAULT_F={
+  first:"",last:"",birthdate:"",email:"",phone:"",pw:"",
+  gender:"",sport:"Basketball",positions:[],
+  gradYear:"",school:"",state:"NY",gpa:"",height:"",weight:"",
+  idDone:false,country:"United States",intl:false,heightCm:"",weightKg:"",
+  club:"",academy:"",
+  preferredDivision:"No Preference",ncaaEligibilityStatus:"",
+  toefl:"",
+};
+function parseAthleteOnboardDraft(){
+  try{
+    const raw=localStorage.getItem(FT_ATHLETE_ONBOARD_DRAFT);
+    if(!raw)return null;
+    const d=JSON.parse(raw);
+    if(!d||typeof d!=="object")return null;
+    let step=typeof d.step==="number"&&d.step>=0&&d.step<=5?d.step:0;
+    const pf=d.f&&typeof d.f==="object"?d.f:{};
+    const f={...ATHLETE_ONBOARD_DEFAULT_F,...pf};
+    if(!Array.isArray(f.positions))f.positions=[];
+    if(!f.intl&&step===4)step=5;
+    return{step,f};
+  }catch{return null;}
+}
+const emailFmtOk=s=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(s||"").trim());
+
 function AthleteOnboard({onComplete,onSignIn}){
-  const[step,setStep]=useState(0);
+  const init=parseAthleteOnboardDraft();
+  const[step,setStep]=useState(init?init.step:0);
+  const[f,setF]=useState(init?init.f:{...ATHLETE_ONBOARD_DEFAULT_F});
   const[authErr,setAuthErr]=useState("");
   const[submitting,setSubmitting]=useState(false);
-  const[f,setF]=useState({first:"",last:"",email:"",pw:"",gender:"",sport:"Basketball",positions:[],gradYear:"",school:"",state:"NY",gpa:"",height:"",weight:"",idDone:false,country:"United States",intl:false,heightCm:"",weightKg:"",club:"",academy:"",eligibilityStatus:"",satScore:"",actScore:"",toefl:"",matchVideo:false});
+  const[t0,setT0]=useState({fn:false,ln:false,em:false,ph:false,pw:false});
+  const[attempt0,setAttempt0]=useState(false);
+  useEffect(()=>{
+    localStorage.setItem(FT_ATHLETE_ONBOARD_DRAFT,JSON.stringify({step,f}));
+  },[step,f]);
   const set=(k,v)=>setF(p=>({...p,[k]:v}));
   const setSport=v=>setF(p=>({...p,sport:v,positions:[]}));
-  const isSoccer=f.sport==="Soccer";const steps=isSoccer?6:4;const ok=[f.first&&f.last&&f.email&&f.pw.length>=8,f.sport&&f.positions.length>0&&f.gradYear,isSoccer?true:f.school&&f.state,isSoccer?(f.school&&f.state):true,isSoccer?true:true,true];
-  const H=["Create your account","Sport & position","Your school","Club & History","Eligibility & Academics","Verify identity"];
+  const phoneOk=(f.phone||"").replace(/\D/g,"").length>=10;
+  const hasEligStep=!!f.intl;
+  const steps=hasEligStep?6:5;
+  const dotCur=hasEligStep?step:(step<=3?step:4);
+  const isSoccer=f.sport==="Soccer";
+  const goNext=()=>{
+    if(step===0&&!ok[0]){setAttempt0(true);return;}
+    setStep(s=>(s===3&&!f.intl)?5:Math.min(s+1,5));
+  };
+  const goBack=()=>setStep(s=>(s===5&&!f.intl)?3:Math.max(s-1,0));
+  useEffect(()=>{if(!f.intl&&step===4)setStep(5);},[f.intl,step]);
+  const e0={
+    fn:(t0.fn||attempt0)&&!String(f.first||"").trim(),
+    ln:(t0.ln||attempt0)&&!String(f.last||"").trim(),
+    emEmpty:(t0.em||attempt0)&&!String(f.email||"").trim(),
+    emFmt:(t0.em||attempt0)&&!!String(f.email||"").trim()&&!emailFmtOk(f.email),
+    ph:(t0.ph||attempt0)&&!phoneOk,
+    pw:(t0.pw||attempt0)&&f.pw.length<8,
+  };
+  const ok=[true,true,true,true,true,true];
+  const H=[
+    "Create your account",
+    "Sport & position",
+    "Academics & measurements",
+    "School & club",
+    "Eligibility & academics",
+    "Become a verified athlete",
+  ];
+  const HSub=[
+    "We use this to create your account and help coaches reach you.",
+    "Tell us how you play so we can match the right programs.",
+    "Academic and athletic details coaches use for eligibility and fit.",
+    "Where you train helps coaches understand your background.",
+    "NCAA eligibility and recruiting preferences for international athletes.",
+    "Optional — verify your identity with a school or government ID.",
+  ];
+  const breadLabs=f.intl?["About you","Sport","Academics","School","Eligibility","Verify"]:["About you","Sport","Academics","School","Verify"];
+  const breadCur=f.intl?step:(step<=3?step:4);
+  const NCAA_ELIG_OPTS=["Not Started","In Progress","Certified — Eligible","Certified — Academic Redshirt","Waiver Pending","Not Applicable (HS Junior or earlier)"];
+  const PREF_DIV_OPTS=["No Preference","D1","D2","D3","NAIA","JUCO","Professional Pathway"];
+
+  const doSignUp=()=>{
+    const meta={
+      role:"athlete",
+      first:f.first,last:f.last,birthdate:f.birthdate,phone:f.phone,
+      gender:f.gender,sport:f.sport,positions:f.positions,gradYear:f.gradYear,
+      school:f.school,state:f.state,gpa:f.gpa,height:f.height,weight:f.weight,
+      intl:f.intl,country:f.country,heightCm:f.heightCm,weightKg:f.weightKg,
+      club:f.club,academy:f.academy,preferredDivision:f.preferredDivision,
+      ncaaEligibilityStatus:f.intl?f.ncaaEligibilityStatus:"",
+      toefl:f.toefl,idDone:!!f.idDone,
+    };
+    localStorage.removeItem(FT_ATHLETE_ONBOARD_DRAFT);
+    localStorage.setItem("ft_gender",f.gender==="Female"?"woman":"man");
+    onComplete({...f,...meta});
+  };
+
+  const startOver=()=>{
+    localStorage.removeItem(FT_ATHLETE_ONBOARD_DRAFT);
+    setStep(0);
+    setF({...ATHLETE_ONBOARD_DEFAULT_F});
+    setAttempt0(false);
+    setT0({fn:false,ln:false,em:false,ph:false,pw:false});
+    setAuthErr("");
+  };
+
   return <div style={{minHeight:"100vh",background:GR,display:"flex",alignItems:"center",justifyContent:"center",padding:22,textAlign:"left"}}><style>{CSS}</style>
-    <div style={{background:W,borderRadius:16,padding:"28px 24px",width:"100%",maxWidth:430,boxShadow:"0 4px 32px rgba(0,0,0,.08)"}}>
-      <div style={{marginBottom:20}}><Logo sz={24}/></div><Dots total={steps} cur={step}/>
-      <h2 style={{fontSize:17,fontWeight:800,color:T,letterSpacing:-.4,marginBottom:4,lineHeight:1.2}}>{H[step]}</h2>
-      {step===0&&<><div style={{display:"flex",gap:9,marginTop:16}}><FL label="First Name" ch={<FIn placeholder="Marcus" value={f.first} onChange={e=>set("first",e.target.value)}/>}/><FL label="Last Name" ch={<FIn placeholder="Johnson" value={f.last} onChange={e=>set("last",e.target.value)}/>}/></div>
-<FL label="Gender" ch={<div style={{display:"flex",gap:8}}>{["Male","Female"].map(g=><button key={g} type="button" onClick={()=>set("gender",g)} style={{flex:1,padding:"10px 0",border:`1.5px solid ${f.gender===g?B:BD}`,borderRadius:4,background:f.gender===g?BL:W,color:f.gender===g?B:TM,fontSize:13,fontWeight:f.gender===g?700:500,cursor:"pointer",transition:"all .15s"}}>{g}</button>)}</div>}/>
-<FL label="Email" ch={<FIn type="email" placeholder="you@email.com" value={f.email} onChange={e=>set("email",e.target.value)}/>}/><FL label="Password" ch={<FIn type="password" placeholder="Min 8 characters" value={f.pw} onChange={e=>set("pw",e.target.value)}/>}/></>}
+    <div style={{background:W,borderRadius:16,padding:"28px 24px",width:"100%",maxWidth:430,boxShadow:"0 4px 32px rgba(0,0,0,.08)",position:"relative"}}>
+      {submitting&&<div style={{position:"absolute",inset:0,background:"rgba(255,255,255,.94)",borderRadius:16,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",zIndex:10,gap:14}}><p style={{fontSize:15,fontWeight:700,color:T,margin:0}}>Creating your profile…</p></div>}
+      <div style={{marginBottom:16}}><Logo sz={24}/></div>
+      <Dots total={steps} cur={dotCur}/>
+      <div style={{fontSize:10,color:TL,marginBottom:12,lineHeight:1.6,display:"flex",flexWrap:"wrap",alignItems:"center",gap:6}}>
+        {breadLabs.map((lab,i)=><span key={lab+i} style={{display:"inline-flex",alignItems:"center",gap:6}}>{i>0&&<span style={{color:BD,fontWeight:400}}>→</span>}<span style={{fontWeight:i===breadCur?700:600,color:i===breadCur?B:TL}}>{lab}</span></span>)}
+      </div>
+      <h2 style={{fontSize:17,fontWeight:800,color:T,letterSpacing:-.4,marginBottom:6,lineHeight:1.2}}>{H[step]}</h2>
+      <p style={{fontSize:12,color:TM,margin:"0 0 14px",lineHeight:1.45}}>{HSub[step]}</p>
+
+      <div key={step} className="fade">
+      {step===0&&<><div style={{display:"flex",gap:9,marginTop:4}}><FL label="First Name" ch={<><FIn placeholder="Marcus" value={f.first} error={e0.fn} onChange={e=>set("first",e.target.value)} onBlur={()=>setT0(p=>({...p,fn:true}))}/>{e0.fn&&<p style={{fontSize:11,color:"#ef4444",marginTop:6,marginBottom:0}}>Enter your first name.</p>}</>}/><FL label="Last Name" ch={<><FIn placeholder="Johnson" value={f.last} error={e0.ln} onChange={e=>set("last",e.target.value)} onBlur={()=>setT0(p=>({...p,ln:true}))}/>{e0.ln&&<p style={{fontSize:11,color:"#ef4444",marginTop:6,marginBottom:0}}>Enter your last name.</p>}</>}/></div>
+      <FL label="Email" ch={<><FIn type="email" placeholder="you@email.com" value={f.email} error={e0.emEmpty||e0.emFmt} onChange={e=>set("email",e.target.value)} onBlur={()=>setT0(p=>({...p,em:true}))}/>{e0.emEmpty&&<p style={{fontSize:11,color:"#ef4444",marginTop:6,marginBottom:0}}>Enter your email.</p>}{e0.emFmt&&!e0.emEmpty&&<p style={{fontSize:11,color:"#ef4444",marginTop:6,marginBottom:0}}>Enter a valid email address.</p>}</>}/>
+      <p style={{fontSize:11,color:TM,margin:"-4px 0 12px",lineHeight:1.45}}>Phone is for account security and coach contact — never sold.</p>
+      <FL label="Phone" ch={<><FIn type="tel" placeholder="(555) 123-4567" inputMode="tel" value={f.phone} error={e0.ph} onChange={e=>set("phone",e.target.value)} onBlur={()=>setT0(p=>({...p,ph:true}))}/>{e0.ph&&<p style={{fontSize:11,color:"#ef4444",marginTop:6,marginBottom:0}}>Enter a valid 10-digit phone number.</p>}</>}/>
+      <FL label="Password" ch={<><FIn type="password" placeholder="Min 8 characters" value={f.pw} error={e0.pw} onChange={e=>set("pw",e.target.value)} onBlur={()=>setT0(p=>({...p,pw:true}))}/>{e0.pw&&<p style={{fontSize:11,color:"#ef4444",marginTop:6,marginBottom:0}}>Use at least 8 characters.</p>}<div style={{marginTop:8}}>{[["At least 8 characters",f.pw.length>=8]].map(([txt,done])=><div key={txt} style={{fontSize:11,color:done?G:TM,marginBottom:3}}>{done?<span style={{color:G,marginRight:6}}>✓</span>:<span style={{marginRight:6}}>○</span>}{txt}</div>)}</div></>}/>
+      </>}
+
       {step===1&&<div style={{marginTop:12}}>
-  <FL label="Sport" ch={<FSel ch={Object.keys(SP).map(s=><option key={s}>{s}</option>)} value={f.sport} onChange={e=>setSport(e.target.value)}/>}/>
-  <FL label="Position" hint="— select all that apply" ch={<PosPick sport={f.sport} sel={f.positions} onChange={v=>set("positions",v)}/>}/>
-  <div style={{marginTop:14}}><FL label="Graduation Year" ch={<FSel ch={[<option key="" value="" disabled>Select year</option>,...GY.map(y=><option key={y} value={y}>{y}</option>)]} value={f.gradYear} onChange={e=>set("gradYear",e.target.value)}/>}/></div>
-  {isSoccer?<>
-    <div style={{background:BL,border:`1px solid ${BR}`,borderRadius:4,padding:"10px 14px",marginBottom:14,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-      <div><p style={{fontSize:13,fontWeight:600,color:T,margin:0}}>International Player</p><p style={{fontSize:11,color:TM,margin:0}}>Based outside the United States</p></div>
-      <button onClick={()=>set("intl",!f.intl)} style={{width:44,height:24,borderRadius:6,background:f.intl?B:BD,border:"none",cursor:"pointer",position:"relative",transition:"background .2s",flexShrink:0}}>
-        <div style={{width:18,height:18,borderRadius:"50%",background:W,position:"absolute",top:3,left:f.intl?23:3,transition:"left .2s",boxShadow:"0 1px 3px rgba(0,0,0,.2)"}}/>
-      </button>
-    </div>
-    {f.intl
-      ?<><FL label="Country" ch={<FSel ch={["Argentina","Australia","Belgium","Brazil","Canada","Colombia","Costa Rica","Croatia","England","France","Germany","Ghana","Ireland","Italy","Jamaica","Mexico","Morocco","Netherlands","Nigeria","Portugal","Scotland","Senegal","South Korea","Spain","Sweden","United States","Other"].map(c=><option key={c}>{c}</option>)} value={f.country} onChange={e=>set("country",e.target.value)}/>}/>
-        <div style={{display:"flex",gap:9}}>
-          <FL label="Height (cm)" ch={<FIn placeholder="185" inputMode="decimal" value={f.heightCm} onChange={e=>set("heightCm",e.target.value)}/>}/>
-          <FL label="Weight (kg)" ch={<FIn placeholder="75" inputMode="decimal" value={f.weightKg} onChange={e=>set("weightKg",e.target.value)}/>}/>
-        </div></>
-      :<div style={{display:"flex",gap:9}}>
+      <FL label="Gender" ch={<div style={{display:"flex",gap:8}}>{["Male","Female"].map(g=><button key={g} type="button" onClick={()=>set("gender",g)} style={{flex:1,padding:"10px 0",border:`1.5px solid ${f.gender===g?B:BD}`,borderRadius:4,background:f.gender===g?BL:W,color:f.gender===g?B:TM,fontSize:13,fontWeight:f.gender===g?700:500,cursor:"pointer",transition:"all .15s"}}>{g}</button>)}</div>}/>
+      <FL label="Sport" ch={<FSel ch={Object.keys(SP).map(s=><option key={s}>{s}</option>)} value={f.sport} onChange={e=>setSport(e.target.value)}/>}/>
+      <FL label="Position" hint="— select all that apply" ch={<PosPick sport={f.sport} sel={f.positions} onChange={v=>set("positions",v)}/>}/>
+      <div style={{background:BL,border:`1px solid ${BR}`,borderRadius:4,padding:"10px 14px",marginTop:14,marginBottom:14,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+        <div><p style={{fontSize:13,fontWeight:600,color:T,margin:0}}>International Player</p><p style={{fontSize:11,color:TM,margin:0}}>Based outside the United States</p></div>
+        <button type="button" onClick={()=>set("intl",!f.intl)} style={{width:44,height:24,borderRadius:6,background:f.intl?B:BD,border:"none",cursor:"pointer",position:"relative",transition:"background .2s",flexShrink:0}}>
+          <div style={{width:18,height:18,borderRadius:"50%",background:W,position:"absolute",top:3,left:f.intl?23:3,transition:"left .2s",boxShadow:"0 1px 3px rgba(0,0,0,.2)"}}/>
+        </button>
+      </div>
+      {f.intl&&<><FL label="Country" ch={<FSel ch={["Argentina","Australia","Belgium","Brazil","Canada","Colombia","Costa Rica","Croatia","England","France","Germany","Ghana","Ireland","Italy","Jamaica","Mexico","Morocco","Netherlands","Nigeria","Portugal","Scotland","Senegal","South Korea","Spain","Sweden","United States","Other"].map(c=><option key={c}>{c}</option>)} value={f.country} onChange={e=>set("country",e.target.value)}/>}/>
+      <div style={{display:"flex",gap:9}}>
+        <FL label="Height (cm)" ch={<FIn placeholder="185" inputMode="decimal" value={f.heightCm} onChange={e=>set("heightCm",e.target.value)}/>}/>
+        <FL label="Weight (kg)" ch={<FIn placeholder="75" inputMode="decimal" value={f.weightKg} onChange={e=>set("weightKg",e.target.value)}/>}/>
+      </div></>}
+      </div>}
+
+      {step===2&&<div style={{marginTop:12}}>
+      <FL label="Birthdate" hint="— type any format you prefer" ch={<FIn type="text" placeholder="e.g. 03/15/2008 or March 15, 2008" autoComplete="bday" inputMode="text" value={f.birthdate} onChange={e=>set("birthdate",e.target.value)}/>}/>
+      <FL label="Graduation Year" ch={<FSel ch={[<option key="" value="" disabled>Select year</option>,...GY.map(y=><option key={y} value={y}>{y}</option>)]} value={f.gradYear} onChange={e=>set("gradYear",e.target.value)}/>}/>
+      {!f.intl&&<div style={{display:"flex",gap:9}}>
         <FL label="Height" ch={<FIn placeholder="6&apos;2&quot;" inputMode="text" value={f.height} onChange={e=>set("height",e.target.value)}/>}/>
         <FL label="Weight (lbs)" ch={<FIn placeholder="185" inputMode="decimal" value={f.weight} onChange={e=>set("weight",e.target.value)}/>}/>
+      </div>}
+      <FL label="GPA" ch={<FIn placeholder="e.g. 3.4" inputMode="decimal" value={f.gpa} onChange={e=>set("gpa",e.target.value)}/>}/>
+      </div>}
+
+      {step===3&&<div style={{marginTop:12}}>
+      <FL label={f.intl?"School / Academy":"Current High School"} ch={<FIn placeholder={f.intl?"e.g. Benfica Academy":"Lincoln High School"} value={f.school} onChange={e=>set("school",e.target.value)}/>}/>
+      {f.intl
+        ?<FL label="City / Region" ch={<FIn placeholder="e.g. Lisbon, Portugal" value={f.state} onChange={e=>set("state",e.target.value)}/>}/>
+        :<FL label="State" ch={<FSel ch={["AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY"].map(s=><option key={s}>{s}</option>)} value={f.state} onChange={e=>set("state",e.target.value)}/>}/>
+      }
+      <FL label="Current Club / Academy" ch={<FIn placeholder="e.g. NY Red Bulls Academy, Manhattan SC" value={f.club} onChange={e=>set("club",e.target.value)}/>}/>
+      <FL label="Club / Academy History" hint="optional" ch={<div style={{border:`1.5px solid ${BD}`,borderRadius:4,padding:"9px 12px"}} onFocus={e=>e.currentTarget.style.borderColor=B} onBlur={e=>e.currentTarget.style.borderColor=BD}><textarea rows={3} placeholder="e.g. 2022–2024 NYRB Academy, 2020–2022 Manhattan SC" value={f.academy} onChange={e=>set("academy",e.target.value)} style={{background:"transparent",width:"100%",border:"none",outline:"none",fontSize:13,color:T,lineHeight:1.55,resize:"none"}}/></div>}/>
+      <div style={{background:GR,border:`1px solid ${BD}`,borderRadius:4,padding:"10px 14px",marginTop:4}}>
+        <p style={{fontSize:11,color:TM,margin:0,lineHeight:1.55}}>Your club history helps coaches understand your development path.</p>
       </div>
-    }
-  </>:<div style={{display:"flex",gap:9}}>
-    <FL label="Height" ch={<FIn placeholder="6&apos;2&quot;" inputMode="text" value={f.height} onChange={e=>set("height",e.target.value)}/>}/>
-    <FL label="Weight" ch={<FIn placeholder="185" inputMode="decimal" value={f.weight} onChange={e=>set("weight",e.target.value)}/>}/>
-  </div>}
-  <FL label="GPA" ch={<FIn placeholder="e.g. 3.4" inputMode="decimal" value={f.gpa} onChange={e=>set("gpa",e.target.value)}/>}/>
-</div>}
-      {step===2&&<div style={{marginTop:12}}>
-  <FL label={f.intl?"School / Academy":"High School"} ch={<FIn placeholder={f.intl?"e.g. Benfica Academy":"Lincoln High School"} value={f.school} onChange={e=>set("school",e.target.value)}/>}/>
-  {f.intl
-    ?<FL label="City / Region" ch={<FIn placeholder="e.g. Lisbon, Portugal" value={f.state} onChange={e=>set("state",e.target.value)}/>}/>
-    :<FL label="State" ch={<FSel ch={["AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY"].map(s=><option key={s}>{s}</option>)} value={f.state} onChange={e=>set("state",e.target.value)}/>}/>
-  }
-</div>}
-      {isSoccer&&step===3&&<div style={{marginTop:12}}>
-  <FL label="Current Club / Academy" ch={<FIn placeholder="e.g. NY Red Bulls Academy, Manhattan SC" value={f.club} onChange={e=>set("club",e.target.value)}/>}/>
-  <FL label="Club / Academy History" hint="optional" ch={<div style={{border:`1.5px solid ${BD}`,borderRadius:4,padding:"9px 12px"}} onFocus={e=>e.currentTarget.style.borderColor=B} onBlur={e=>e.currentTarget.style.borderColor=BD}><textarea rows={3} placeholder="e.g. 2022–2024 NYRB Academy, 2020–2022 Manhattan SC, 2018–2020 East NY United" value={f.academy} onChange={e=>set("academy",e.target.value)} style={{background:"transparent",width:"100%",border:"none",outline:"none",fontSize:13,color:T,lineHeight:1.55,resize:"none"}}/></div>}/>
-  <FL label="Preferred Division" ch={<FSel ch={["No Preference","D1","D2","D3","NAIA","JUCO","Professional Pathway"].map(d=><option key={d}>{d}</option>)} value={f.eligibilityStatus||"No Preference"} onChange={e=>set("eligibilityStatus",e.target.value)}/>}/>
-  <div style={{background:GR,border:`1px solid ${BD}`,borderRadius:4,padding:"10px 14px",marginTop:4}}>
-    <p style={{fontSize:11,color:TM,margin:0,lineHeight:1.55}}>Your club history helps coaches understand your level of play and development path. Be as detailed as possible.</p>
-  </div>
-</div>}
+      </div>}
 
-{isSoccer&&step===4&&<div style={{marginTop:12}}>
-  <div style={{background:"#fffbeb",border:"1px solid #fde68a",borderRadius:5,padding:"12px 14px",marginBottom:16}}>
-    <p style={{fontSize:12,fontWeight:700,color:"#92400e",margin:0,marginBottom:3}}>NCAA Eligibility</p>
-    <p style={{fontSize:11,color:"#92400e",margin:0,lineHeight:1.5}}>College coaches need to know your academic eligibility status. International players must also complete NCAA eligibility through the NCAA Eligibility Center before playing college soccer.</p>
-  </div>
-  <FL label="NCAA Eligibility Status" ch={<FSel ch={["Not Started","In Progress","Certified — Eligible","Certified — Academic Redshirt","Waiver Pending","Not Applicable (HS Junior or earlier)"].map(s=><option key={s}>{s}</option>)} value={f.eligibilityStatus} onChange={e=>set("eligibilityStatus",e.target.value)}/>}/>
-  {f.intl&&<FL label="English Proficiency (TOEFL)" hint="if applicable" ch={<FIn placeholder="e.g. 90" inputMode="numeric" value={f.toefl} onChange={e=>set("toefl",e.target.value)}/>}/>}
-  <div style={{display:"flex",gap:9}}>
-    <FL label="SAT Score" hint="optional" ch={<FIn placeholder="e.g. 1150" inputMode="numeric" value={f.satScore} onChange={e=>set("satScore",e.target.value)}/>}/>
-    <FL label="ACT Score" hint="optional" ch={<FIn placeholder="e.g. 24" inputMode="numeric" value={f.actScore} onChange={e=>set("actScore",e.target.value)}/>}/>
-  </div>
-  <FL label="Intended Major" hint="optional" ch={<FIn placeholder="e.g. Business, Sports Management" value={f.major||""} onChange={e=>set("major",e.target.value)}/>}/>
-</div>}
+      {step===4&&f.intl&&<div style={{marginTop:12}}>
+      <div style={{background:"#fffbeb",border:"1px solid #fde68a",borderRadius:5,padding:"12px 14px",marginBottom:16}}>
+        <p style={{fontSize:12,fontWeight:700,color:"#92400e",margin:0,marginBottom:3}}>NCAA Eligibility</p>
+        <p style={{fontSize:11,color:"#92400e",margin:0,lineHeight:1.5}}>{isSoccer?"College coaches need to know your academic eligibility status. International players must also complete NCAA eligibility through the NCAA Eligibility Center before playing college soccer.":"College coaches need to know your academic eligibility status. Complete NCAA Eligibility Center registration when required for your sport."}</p>
+      </div>
+      <FL label="Preferred Division (recruiting)" ch={<FSel ch={PREF_DIV_OPTS.map(d=><option key={d}>{d}</option>)} value={f.preferredDivision} onChange={e=>set("preferredDivision",e.target.value)}/>}/>
+      <FL label="NCAA Eligibility Status" ch={<FSel ch={[<option key="_p" value="" disabled>Select status</option>,...NCAA_ELIG_OPTS.map(s=><option key={s} value={s}>{s}</option>)]} value={f.ncaaEligibilityStatus} onChange={e=>set("ncaaEligibilityStatus",e.target.value)}/>}/>
+      {f.intl&&<FL label="English Proficiency (TOEFL)" hint="if applicable" ch={<FIn placeholder="e.g. 90" inputMode="numeric" value={f.toefl} onChange={e=>set("toefl",e.target.value)}/>}/>}
+      </div>}
 
-{((isSoccer&&step===5)||(!isSoccer&&step===3))&&<div style={{marginTop:12}}><div style={{background:BL,border:`1px solid ${BR}`,borderRadius:4,padding:"12px 14px",fontSize:12,color:"#C4622A",lineHeight:1.6,marginBottom:14}}>Upload a school-issued student ID or athletic clearance card. Used only for verification.</div>{!f.idDone?<div onClick={()=>set("idDone",true)} style={{border:`1.5px dashed ${BD}`,borderRadius:5,padding:28,textAlign:"center",cursor:"pointer"}} onMouseEnter={e=>{e.currentTarget.style.borderColor=B;e.currentTarget.style.background=BL}} onMouseLeave={e=>{e.currentTarget.style.borderColor=BD;e.currentTarget.style.background=W}}><div style={{width:42,height:42,background:BL,border:`1px solid ${BR}`,borderRadius:5,display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 11px"}}><Ic.card size={20} color={B}/></div><p style={{fontSize:14,fontWeight:700,color:T,marginBottom:2}}>Upload Student ID</p><p style={{fontSize:12,color:TM}}>JPG, PNG or PDF — max 10 MB</p><div style={{marginTop:14,display:"inline-block",background:B,color:W,padding:"8px 22px",borderRadius:4,fontSize:12,fontWeight:700}}>Choose File</div></div>:<div style={{background:GL,border:"1px solid #6ee7b7",borderRadius:5,padding:24,textAlign:"center"}}><div style={{width:38,height:38,background:"#d1fae5",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 9px"}}><Ic.check size={18} color={G}/></div><p style={{fontSize:14,fontWeight:700,color:G,marginBottom:2}}>ID Uploaded</p><p style={{fontSize:12,color:TM}}>Verification within 24 hours.</p></div>}<p style={{fontSize:11,color:TM,background:"#fffbeb",border:"1px solid #fde68a",borderRadius:4,padding:"8px 12px",marginTop:10}}>Your ID is never shared with coaches or third parties.</p></div>}
+      {step===5&&<div style={{marginTop:12}}><div style={{background:BL,border:`1px solid ${BR}`,borderRadius:4,padding:"12px 14px",fontSize:12,color:"#C4622A",lineHeight:1.6,marginBottom:14}}>Upload a photo of your school-issued student ID, athletic clearance, or government ID. Used only for verification.</div>{!f.idDone?<div onClick={()=>set("idDone",true)} style={{border:`1.5px dashed ${BD}`,borderRadius:5,padding:28,textAlign:"center",cursor:"pointer"}} onMouseEnter={e=>{e.currentTarget.style.borderColor=B;e.currentTarget.style.background=BL}} onMouseLeave={e=>{e.currentTarget.style.borderColor=BD;e.currentTarget.style.background=W}}><div style={{width:42,height:42,background:BL,border:`1px solid ${BR}`,borderRadius:5,display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 11px"}}><Ic.card size={20} color={B}/></div><p style={{fontSize:14,fontWeight:700,color:T,marginBottom:2}}>Upload ID photo</p><p style={{fontSize:12,color:TM}}>JPG, PNG or PDF — max 10 MB</p><div style={{marginTop:14,display:"inline-block",background:B,color:W,padding:"8px 22px",borderRadius:4,fontSize:12,fontWeight:700}}>Choose File</div></div>:<div style={{background:GL,border:"1px solid #6ee7b7",borderRadius:5,padding:24,textAlign:"center"}}><div style={{width:38,height:38,background:"#d1fae5",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 9px"}}><Ic.check size={18} color={G}/></div><p style={{fontSize:14,fontWeight:700,color:G,marginBottom:2}}>ID Uploaded</p><p style={{fontSize:12,color:TM}}>Verification within 24 hours.</p></div>}<p style={{fontSize:11,color:TM,background:"#fffbeb",border:"1px solid #fde68a",borderRadius:4,padding:"8px 12px",marginTop:10}}>Your ID is never shared with coaches or third parties.</p></div>}
+
+      </div>
+
       {authErr&&<p style={{fontSize:12,color:"#ef4444",margin:"12px 0 0",lineHeight:1.4}}>{authErr}</p>}
-      <div style={{display:"flex",gap:8,marginTop:20}}>{step>0&&<Btn ch="Back" v="g" sx={{flex:1}} onClick={()=>setStep(s=>s-1)}/>}{step<steps-1?<Btn ch="Continue" dis={!ok[step]} sx={{flex:2}} onClick={()=>setStep(s=>s+1)}/>:<Btn ch={submitting?"Creating…":"Create Account"} dis={submitting} sx={{flex:2}} onClick={async()=>{setSubmitting(true);setAuthErr("");const{error}=await supabase.auth.signUp({email:f.email,password:f.pw,options:{data:{role:"athlete",first:f.first,last:f.last,sport:f.sport,positions:f.positions,gradYear:f.gradYear,school:f.school,state:f.state,gpa:f.gpa,height:f.height,weight:f.weight}}});setSubmitting(false);if(error){setAuthErr(error.message);}else{onComplete(f);}}}/>}</div>
-      <p style={{fontSize:12,color:TL,textAlign:"center",marginTop:14}}>Have an account? <span style={{color:B,fontWeight:600,cursor:"pointer"}} onClick={onSignIn}>Sign in</span></p>
+      <div style={{display:"flex",gap:8,marginTop:20,flexWrap:"wrap"}}>
+        {step>0&&<Btn ch="Back" v="g" sx={{flex:1,minWidth:100}} onClick={goBack}/>}
+        {step<5&&<Btn ch="Continue" dis={!ok[step]} sx={{flex:2,minWidth:140}} onClick={goNext}/>}
+        {step===5&&<>
+          <Btn ch="Create account" dis={submitting} sx={{flex:2,minWidth:140}} onClick={doSignUp}/>
+        </>}
+      </div>
+      {step===5&&<button type="button" disabled={submitting} onClick={doSignUp} style={{width:"100%",marginTop:10,background:"none",border:"none",cursor:submitting?"default":"pointer",fontSize:12,fontWeight:700,color:B,padding:"8px 0"}}>Skip verification — create account</button>}
+      <p style={{fontSize:11,color:TL,textAlign:"center",marginTop:12}}><button type="button" onClick={startOver} style={{background:"none",border:"none",cursor:"pointer",color:TL,textDecoration:"underline",fontSize:11,padding:0}}>Start over</button></p>
+      <p style={{fontSize:12,color:TL,textAlign:"center",marginTop:6}}>Have an account? <span style={{color:B,fontWeight:600,cursor:"pointer"}} onClick={onSignIn}>Sign in</span></p>
     </div>
   </div>;
 }
+
 
 function CoachOnboard({onComplete,onSignIn}){
   const[step,setStep]=useState(0);
@@ -504,7 +617,7 @@ function CoachOnboard({onComplete,onSignIn}){
   const[submitting,setSubmitting]=useState(false);
   const[f,setF]=useState({first:"",last:"",email:"",pw:"",school:"",div:"D1",conf:"",sport:"Basketball",role:"Head Coach",emailDone:false,credDone:false});
   const set=(k,v)=>setF(p=>({...p,[k]:v}));
-  const ok=[f.first&&f.last&&f.email&&f.pw.length>=8,f.school&&f.div&&f.sport&&f.role,f.emailDone,true];
+  const ok=[true,true,true,true];
   const H=["Create your account","Your program","Verify school email","Upload credentials"];
   return <div style={{minHeight:"100vh",background:GR,display:"flex",alignItems:"center",justifyContent:"center",padding:22,textAlign:"left"}}><style>{CSS}</style>
     <div style={{background:W,borderRadius:4,padding:"28px 24px",width:"100%",maxWidth:430,boxShadow:"0 2px 40px rgba(10,14,26,.1)",border:`1px solid ${BD}`}}>
@@ -515,19 +628,50 @@ function CoachOnboard({onComplete,onSignIn}){
       {step===2&&<div style={{marginTop:12}}>{!f.emailDone?<div style={{background:GR,border:`1px solid ${BD}`,borderRadius:6,padding:20,textAlign:"center"}}><div style={{width:40,height:40,background:PUL,border:`1px solid ${PUB}`,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 10px"}}><Ic.mail size={19} color={PU}/></div><p style={{fontSize:14,fontWeight:700,color:T,marginBottom:5}}>Check your school inbox</p><p style={{fontSize:12,color:TM,marginBottom:14}}>Link sent to <strong>{f.email||"your email"}</strong></p><Btn ch="I clicked the link" v="o" ac={PU} onClick={()=>set("emailDone",true)}/></div>:<div style={{background:GL,border:"1px solid #6ee7b7",borderRadius:6,padding:24,textAlign:"center"}}><div style={{width:38,height:38,background:"#d1fae5",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 9px"}}><Ic.check size={18} color={G}/></div><p style={{fontSize:14,fontWeight:700,color:G}}>Email Verified</p></div>}</div>}
       {step===3&&<div style={{marginTop:12}}>{!f.credDone?<div onClick={()=>set("credDone",true)} style={{border:`1.5px dashed ${BD}`,borderRadius:5,padding:28,textAlign:"center",cursor:"pointer"}} onMouseEnter={e=>{e.currentTarget.style.borderColor=PU;e.currentTarget.style.background=PUL}} onMouseLeave={e=>{e.currentTarget.style.borderColor=BD;e.currentTarget.style.background=W}}><div style={{width:42,height:42,background:PUL,border:`1px solid ${PUB}`,borderRadius:5,display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 11px"}}><Ic.file size={20} color={PU}/></div><p style={{fontSize:14,fontWeight:700,color:T,marginBottom:2}}>Upload Credentials</p><p style={{fontSize:12,color:TM}}>Contract, staff page, or employment letter</p><div style={{marginTop:14,display:"inline-block",background:PU,color:W,padding:"8px 22px",borderRadius:4,fontSize:12,fontWeight:700}}>Choose File</div></div>:<div style={{background:GL,border:"1px solid #6ee7b7",borderRadius:5,padding:24,textAlign:"center"}}><div style={{width:38,height:38,background:"#d1fae5",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 9px"}}><Ic.check size={18} color={G}/></div><p style={{fontSize:14,fontWeight:700,color:G,marginBottom:2}}>Credentials Uploaded</p><p style={{fontSize:12,color:TM}}>Verified badge within 24 hours.</p></div>}</div>}
       {authErr&&<p style={{fontSize:12,color:"#ef4444",margin:"12px 0 0",lineHeight:1.4}}>{authErr}</p>}
-      <div style={{display:"flex",gap:8,marginTop:20}}>{step>0&&<Btn ch="Back" v="g" ac={PU} sx={{flex:1}} onClick={()=>setStep(s=>s-1)}/>}{step<3?<Btn ch="Continue" dis={!ok[step]} ac={PU} sx={{flex:2}} onClick={()=>setStep(s=>s+1)}/>:<Btn ch={submitting?"Creating…":"Create Coach Account"} dis={submitting} ac={PU} sx={{flex:2}} onClick={async()=>{setSubmitting(true);setAuthErr("");const{error}=await supabase.auth.signUp({email:f.email,password:f.pw,options:{data:{role:"coach",first:f.first,last:f.last,school:f.school,div:f.div,conf:f.conf,sport:f.sport,coachRole:f.role}}});setSubmitting(false);if(error){setAuthErr(error.message);}else{onComplete(f);}}}/>}</div>
+      <div style={{display:"flex",gap:8,marginTop:20}}>{step>0&&<Btn ch="Back" v="g" ac={PU} sx={{flex:1}} onClick={()=>setStep(s=>s-1)}/>}{step<3?<Btn ch="Continue" dis={!ok[step]} ac={PU} sx={{flex:2}} onClick={()=>setStep(s=>s+1)}/>:<Btn ch="Create Coach Account" ac={PU} sx={{flex:2}} onClick={()=>onComplete(f)}/>}</div>
       <p style={{fontSize:12,color:TL,textAlign:"center",marginTop:14}}>Have an account? <span style={{color:PU,fontWeight:600,cursor:"pointer"}} onClick={onSignIn}>Sign in</span></p>
     </div>
   </div>;
 }
 
 // ── ATHLETE APP ──
-function DarkProfile({user,posts,metricValues,setEditMetric,setSelPost,followers,following,followReqs,accepted,setFollowOpen,setTab,setEditOpen}){
+function DarkProfile({user,posts,tapeOrder,setTapeOrder,metricValues,setEditMetric,setSelPost,followers,following,followReqs,accepted,setFollowOpen,setTab,setEditOpen,coachContacts,coachDraft,setCoachDraft,startCoachDraft,saveCoachDraft,cancelCoachDraft,expandedCoachId,toggleCoach,coachEditDraft,setCoachEditDraft,saveCoachEdits,cancelCoachEdits,removeCoachContact}){
   const[ptab,setPtab]=useState("overview");
   const[pfollowing,setPfollowing]=useState(false);
   const[psaved,setPsaved]=useState(false);
   const[shareOpen,setShareOpen]=useState(false);
   const[cpd,setCpd]=useState(false);
+  const tape=(tapeOrder||[]).map(id=>posts.find(p=>p.id===id)).filter(Boolean);
+  const moveClip=(id,dir)=>{setTapeOrder(o=>{const i=o.indexOf(id);if(dir==="up"&&i>0){const n=[...o];[n[i-1],n[i]]=[n[i],n[i-1]];return n;}if(dir==="dn"&&i<o.length-1){const n=[...o];[n[i],n[i+1]]=[n[i+1],n[i]];return n;}return o;});};
+  const[tapeEditorOpen,setTapeEditorOpen]=useState(false);
+  const[tapeEditorSel,setTapeEditorSel]=useState(0);
+  const[tapePreviewOpen,setTapePreviewOpen]=useState(false);
+  const[tapePreviewIdx,setTapePreviewIdx]=useState(-1);
+  const[previewProgress,setPreviewProgress]=useState(0);
+  const parseDur=d=>{const[m,s]=(d||"0:00").split(":").map(Number);return(m||0)*60+(s||0);};
+  const fmtDur=s=>`${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`;
+  const totalTapeDur=fmtDur(tape.reduce((sum,c)=>sum+parseDur(c.duration),0));
+  const tapeLastUpdated=tape.length?tape.reduce((latest,c)=>c.date>latest?c.date:latest,""):null;
+  const tapeSlug=`fasttrackrecruit.com/tape/${(user?.first||"andrew").toLowerCase()}${(user?.last||"johnson").toLowerCase()}`;
+  useEffect(()=>{
+    if(!tapePreviewOpen)return;
+    setPreviewProgress(0);
+    const dur=tapePreviewIdx===-1?3000:2500;
+    const tick=50;let elapsed=0;
+    const iv=setInterval(()=>{
+      elapsed+=tick;
+      setPreviewProgress(Math.min(100,(elapsed/dur)*100));
+      if(elapsed>=dur){
+        clearInterval(iv);
+        setTapePreviewIdx(i=>{
+          const next=i+1;
+          if(next>tape.length){setTapePreviewOpen(false);return -1;}
+          return next;
+        });
+      }
+    },tick);
+    return()=>clearInterval(iv);
+  },[tapePreviewOpen,tapePreviewIdx]);
   const qrRef=useRef(null);
   const pUrl=`https://fasttrack.app/u/${(user?.first||"andrew").toLowerCase()}-${(user?.last||"johnson").toLowerCase()}-${user?.gradYear||"2027"}`;
   const copyLink=()=>{navigator.clipboard?.writeText(pUrl);setCpd(true);setTimeout(()=>setCpd(false),2200);};
@@ -573,7 +717,7 @@ function DarkProfile({user,posts,metricValues,setEditMetric,setSelPost,followers
       {right&&<span style={{fontSize:11,fontWeight:600,color:PACC}}>{right}</span>}
     </div>
   );
-  return(
+  return(<>
     <div style={{background:PBG,flex:1,overflowY:"auto"}}>
       <style>{`.pbtn-p{background:#D97757;color:#fff;border:none;border-radius:2px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer}.pbtn-s{background:#1a1a1a;color:#ccc;border:1px solid #2a2a2a;border-radius:2px;padding:8px 13px;font-size:12px;font-weight:600;cursor:pointer}.ptab-a{border-bottom:2px solid #D97757;color:#fff;font-weight:700}.ptab-i{border-bottom:2px solid transparent;color:#555;font-weight:700}`}</style>
 
@@ -633,56 +777,60 @@ function DarkProfile({user,posts,metricValues,setEditMetric,setSelPost,followers
 
       <div style={{height:8,background:`linear-gradient(180deg,${PCARD},${PBG})`}}/><PDiv/><div style={{height:8,background:`linear-gradient(180deg,${PBG},${PCARD})`}}/>
 
-      {/* RECRUITING INFO */}
-      <div style={{background:PCARD,padding:"12px 16px"}}>
-        <PSec right={`Class of ${user?.gradYear||"2027"}`}>Recruiting Info</PSec>
-        <div style={{display:"flex",background:PCARD2,border:`1px solid ${PBD}`,borderRadius:2,overflow:"hidden",marginBottom:10}}>
-          {[["Level","D1 Target"],["NCAA","Eligible"],["Major","Sports Mgmt"]].map(([l,v],i,a)=>(
-            <div key={l} style={{flex:1,padding:"8px 10px",borderRight:i<a.length-1?`1px solid ${PBD}`:"none"}}>
-              <div style={{fontSize:8,color:PTXT3,fontWeight:700,textTransform:"uppercase",letterSpacing:.6,marginBottom:2}}>{l}</div>
-              <div style={{fontSize:11,color:PTXT,fontWeight:600}}>{v}</div>
-            </div>
-          ))}
-        </div>
-        <div style={{display:"flex",alignItems:"center",gap:8}}>
-          <span style={{fontSize:8,color:PTXT3,fontWeight:700,textTransform:"uppercase",letterSpacing:.6,flexShrink:0}}>Offers</span>
-          {POFFERS.map(o=>(
-            <div key={o.school} style={{display:"flex",alignItems:"center",gap:6,background:PCARD2,border:`1px solid ${PBD}`,borderRadius:2,padding:"4px 9px"}}>
-              <div style={{width:18,height:18,borderRadius:"50%",background:`linear-gradient(135deg,${PACC},${PACC2})`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:8,fontWeight:800,color:"#fff",flexShrink:0}}>{o.school[0]}</div>
-              <span style={{fontSize:10,fontWeight:700,color:PTXT}}>{o.school}</span>
-              <span style={{fontSize:9,color:PTXT3}}>{o.div}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div style={{height:8,background:`linear-gradient(180deg,${PCARD},${PBG})`}}/><PDiv/><div style={{height:8,background:`linear-gradient(180deg,${PBG},${PCARD})`}}/>
-
-      {/* FEATURED VIDEO */}
-      <div style={{background:PCARD,padding:"14px 16px"}}>
+      {/* HIGHLIGHT TAPE — OVERVIEW */}
+      <div style={{background:PCARD,padding:"16px 16px"}}>
         <PSec>Highlight Tape</PSec>
-        <div style={{borderRadius:2,overflow:"hidden",cursor:"pointer",position:"relative",aspectRatio:"16/9",background:"#0d1117",display:"flex",alignItems:"center",justifyContent:"center"}} onClick={()=>posts[0]&&setSelPost(posts[0])}>
-          <div style={{position:"absolute",inset:0,background:"linear-gradient(160deg,#1e3a5f,#0d1117)"}}/>
-          <div style={{position:"relative",width:52,height:52,borderRadius:"50%",background:"rgba(217,119,87,.9)",display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 4px 24px rgba(217,119,87,.35)"}}>
-            <svg width={18} height={18} viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21"/></svg>
+        {tape.length===0?(
+          <div style={{border:`1.5px dashed ${PBD}`,borderRadius:8,padding:"32px 16px",textAlign:"center"}}>
+            <p style={{fontSize:14,fontWeight:700,color:PTXT2,margin:0,marginBottom:6}}>No clips in your tape yet</p>
+            <p style={{fontSize:12,color:PTXT3,margin:0,lineHeight:1.5}}>Post a clip to Media and add it to your tape — your tape is the link coaches open.</p>
           </div>
-          <div style={{position:"absolute",bottom:12,left:12,right:12,display:"flex",justifyContent:"space-between",alignItems:"flex-end"}}>
-            <div>
-              <div style={{fontSize:13,fontWeight:700,color:"#fff",marginBottom:2}}>{posts[0]?.title||"Highlight Tape 2026"}</div>
-              <div style={{fontSize:10,color:"rgba(255,255,255,.5)"}}>{posts[0]?.type||"Tape"} · {posts[0]?.duration||"4:22"}</div>
+        ):(
+          <>
+            {/* Hero thumbnail */}
+            <div style={{borderRadius:8,overflow:"hidden",cursor:"pointer",position:"relative",aspectRatio:"16/9",background:"#0d1117",display:"flex",alignItems:"center",justifyContent:"center",marginBottom:12}} onClick={()=>{setTapePreviewIdx(-1);setTapePreviewOpen(true);}}>
+              <div style={{position:"absolute",inset:0,background:`linear-gradient(160deg,${tape[0].thumb||"#1e3a5f"},#0d1117)`}}/>
+              <div style={{position:"absolute",inset:0,background:"rgba(0,0,0,.25)"}}/>
+              <div style={{position:"relative",width:56,height:56,borderRadius:"50%",background:"rgba(217,119,87,.92)",display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 4px 28px rgba(217,119,87,.5)"}}>
+                <svg width={20} height={20} viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21"/></svg>
+              </div>
+              <div style={{position:"absolute",bottom:0,left:0,right:0,padding:"20px 14px 12px",background:"linear-gradient(0deg,rgba(0,0,0,.85),transparent)"}}>
+                <div style={{fontSize:14,fontWeight:800,color:"#fff",marginBottom:3,letterSpacing:-.2}}>{tape[0].title}</div>
+                <div style={{fontSize:11,color:"rgba(255,255,255,.6)"}}>{totalTapeDur} total · {tape.length} clip{tape.length!==1?"s":""}</div>
+              </div>
             </div>
-            <div style={{background:"rgba(0,0,0,.6)",borderRadius:2,padding:"2px 7px"}}>
-              <span style={{fontSize:9,color:"#fff"}}>{posts[0]?.views||412} views</span>
+            {/* Last updated */}
+            {tapeLastUpdated&&<p style={{fontSize:11,color:PTXT3,margin:"0 0 12px"}}>Last updated {tapeLastUpdated}</p>}
+            {/* Action buttons */}
+            <div style={{display:"flex",gap:8,marginBottom:16}}>
+              <button onClick={()=>{setTapePreviewIdx(-1);setTapePreviewOpen(true);}} style={{flex:1,background:"rgba(217,119,87,.12)",border:"1.5px solid rgba(217,119,87,.35)",borderRadius:6,padding:"11px 0",cursor:"pointer",fontSize:12,fontWeight:700,color:PACC}}>Preview Tape</button>
+              <button onClick={()=>{setTapeEditorSel(0);setTapeEditorOpen(true);}} style={{flex:1,background:PACC,border:"none",borderRadius:6,padding:"11px 0",cursor:"pointer",fontSize:12,fontWeight:700,color:"#fff"}}>Edit Tape</button>
             </div>
-          </div>
-        </div>
+            {/* Shareable link */}
+            <div style={{background:"#0d0d0d",border:`1px solid ${PBD}`,borderRadius:6,padding:"10px 12px",marginBottom:10}}>
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:8}}>
+                <span style={{fontSize:11,color:PTXT3,flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{tapeSlug}</span>
+                <button onClick={()=>{navigator.clipboard?.writeText(`https://${tapeSlug}`);}} style={{background:PACC,border:"none",borderRadius:4,padding:"5px 12px",cursor:"pointer",fontSize:11,fontWeight:700,color:"#fff",flexShrink:0}}>Copy Link</button>
+              </div>
+            </div>
+            {/* Stats */}
+            <div style={{display:"flex",gap:16}}>
+              {[["247","Coach Views"],["18","Link Opens"],["412","Total Views"]].map(([v,l])=>(
+                <div key={l} style={{textAlign:"center"}}>
+                  <p style={{fontSize:16,fontWeight:800,color:PTXT,margin:0,lineHeight:1}}>{v}</p>
+                  <p style={{fontSize:9,color:PTXT3,fontWeight:600,margin:"3px 0 0",letterSpacing:.4,textTransform:"uppercase"}}>{l}</p>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
       </div>
 
       <div style={{height:8,background:`linear-gradient(180deg,${PCARD},${PBG})`}}/><PDiv/><div style={{height:8,background:`linear-gradient(180deg,${PBG},${PCARD})`}}/>
 
       {/* SUB TABS */}
       <div style={{background:PCARD,borderBottom:`1px solid ${PBD}`,display:"flex"}}>
-        {[["overview","Overview"],["stats","Stats"],["media","Media"],["info","Info"]].map(([id,label],i)=>(
+        {[["overview","Overview"],["metrics","Metrics"],["media","Media"],["info","Info"]].map(([id,label],i)=>(
           <button key={id} onClick={()=>setPtab(id)} className={ptab===id?"ptab-a":"ptab-i"}
             style={{flex:1,background:"none",border:"none",borderLeft:i>0?`1px solid ${PBD}`:"none",padding:"11px 0",fontSize:11,cursor:"pointer",transition:"all .12s",letterSpacing:.3}}>
             {label}
@@ -692,19 +840,6 @@ function DarkProfile({user,posts,metricValues,setEditMetric,setSelPost,followers
 
       {/* OVERVIEW */}
       {ptab==="overview"&&<>
-        <div style={{background:PCARD,padding:"14px 16px",marginTop:8}}>
-          <PSec>Athletic Metrics</PSec>
-          <div style={{display:"flex",flexWrap:"wrap",background:PCARD2,border:`1px solid ${PBD}`,borderRadius:2,overflow:"hidden"}}>
-            {ppinned.map((m,i)=>(
-              <div key={m.label} onClick={()=>setEditMetric(m)} style={{flex:"1 0 33%",textAlign:"center",padding:"11px 6px",borderRight:(i+1)%3!==0?`1px solid ${PBD}`:"none",borderBottom:i<3?`1px solid ${PBD}`:"none",cursor:"pointer"}}>
-                <div style={{fontSize:18,fontWeight:800,color:m.value?PTXT:"#333",letterSpacing:-.6,lineHeight:1,marginBottom:3}}>{m.value||"—"}{m.value&&m.unit&&<span style={{fontSize:8,color:PTXT3,marginLeft:3,fontWeight:500}}>{m.unit}</span>}</div>
-                <div style={{fontSize:8,color:PTXT3,textTransform:"uppercase",letterSpacing:.6,fontWeight:600}}>{m.label}</div>
-              </div>
-            ))}
-          </div>
-          <p style={{fontSize:9,color:PTXT3,marginTop:8,lineHeight:1.5}}>Self-reported. Tap any value to update.</p>
-        </div>
-        <div style={{height:6,background:`linear-gradient(180deg,${PCARD},${PBG})`}}/><PDiv/><div style={{height:6,background:`linear-gradient(180deg,${PBG},${PCARD})`}}/>
         <div style={{background:PCARD,padding:"14px 16px"}}>
           <PSec>Club History</PSec>
           {PCLUBS.map((c,i,a)=>(
@@ -739,9 +874,9 @@ function DarkProfile({user,posts,metricValues,setEditMetric,setSelPost,followers
         </div>
       </>}
 
-      {/* STATS */}
-      {ptab==="stats"&&<div style={{background:PCARD,padding:"14px 16px",marginTop:8}}>
-        <PSec>Athletic Metrics</PSec>
+      {/* METRICS */}
+      {ptab==="metrics"&&<div style={{background:PCARD,padding:"14px 16px",marginTop:8}}>
+        <PSec right={<button onClick={()=>setEditMetric(PMETRICS[0])} style={{background:"transparent",border:`1px solid ${PBD}`,color:PTXT,fontSize:10,fontWeight:800,padding:"5px 10px",borderRadius:2,cursor:"pointer"}}>Edit</button>}>Metrics</PSec>
         {["Physical","Speed","Jump","Strength","Sport"].map(cat=>{
           const ms=PMETRICS.filter(m=>m.cat===cat);
           if(!ms.length)return null;
@@ -749,7 +884,7 @@ function DarkProfile({user,posts,metricValues,setEditMetric,setSelPost,followers
             <div key={cat} style={{marginBottom:16}}>
               <div style={{fontSize:8,fontWeight:700,color:PACC,textTransform:"uppercase",letterSpacing:1.2,marginBottom:6,paddingBottom:4,borderBottom:`1px solid ${PBD}`}}>{cat}</div>
               {ms.map((m,i,a)=>(
-                <div key={m.label} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"8px 0",borderBottom:i<a.length-1?`1px solid ${PBD}`:"none"}}>
+                <div key={m.label} onClick={()=>setEditMetric(m)} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"8px 0",borderBottom:i<a.length-1?`1px solid ${PBD}`:"none",cursor:"pointer"}}>
                   <span style={{fontSize:12,color:PTXT2,fontWeight:500}}>{m.label}</span>
                   <div style={{display:"flex",alignItems:"baseline",gap:4}}>
                     <span style={{fontSize:14,fontWeight:800,color:PTXT,letterSpacing:-.4}}>{m.value||"—"}</span>
@@ -765,18 +900,22 @@ function DarkProfile({user,posts,metricValues,setEditMetric,setSelPost,followers
       {/* MEDIA */}
       {ptab==="media"&&<div style={{background:PBG,paddingTop:2}}>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:2}}>
-          {posts.map(p=>(
-            <div key={p.id} style={{position:"relative",paddingBottom:"100%",overflow:"hidden",cursor:"pointer",background:PCARD}} onClick={()=>setSelPost(p)}>
-              <div style={{position:"absolute",inset:0,background:`linear-gradient(145deg,${p.thumb},#0d1117)`}}/>
-              <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center"}}>
-                <div style={{width:26,height:26,borderRadius:"50%",background:"rgba(217,119,87,.75)",display:"flex",alignItems:"center",justifyContent:"center"}}>
-                  <svg width={12} height={12} viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21"/></svg>
+          {posts.map(p=>{
+            const tpos=tapeOrder.indexOf(p.id);
+            return(
+              <div key={p.id} style={{position:"relative",paddingBottom:"100%",overflow:"hidden",cursor:"pointer",background:PCARD}} onClick={()=>setSelPost(p)}>
+                <div style={{position:"absolute",inset:0,background:`linear-gradient(145deg,${p.thumb},#0d1117)`}}/>
+                <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center"}}>
+                  <div style={{width:26,height:26,borderRadius:"50%",background:"rgba(217,119,87,.75)",display:"flex",alignItems:"center",justifyContent:"center"}}>
+                    <svg width={12} height={12} viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21"/></svg>
+                  </div>
                 </div>
+                <div style={{position:"absolute",bottom:4,right:5}}><span style={{fontSize:8,color:"rgba(255,255,255,.7)",fontWeight:600}}>{p.duration}</span></div>
+                <span style={{position:"absolute",top:4,left:4,fontSize:7,fontWeight:700,color:"#fff",background:"rgba(0,0,0,.55)",padding:"1px 4px",borderRadius:2}}>{p.type}</span>
+                {tpos>=0&&<span style={{position:"absolute",top:4,right:4,fontSize:7,fontWeight:800,color:"#fff",background:B,padding:"1px 5px",borderRadius:2}}>#{tpos+1}</span>}
               </div>
-              <div style={{position:"absolute",bottom:4,right:5}}><span style={{fontSize:8,color:"rgba(255,255,255,.7)",fontWeight:600}}>{p.duration}</span></div>
-              <span style={{position:"absolute",top:4,left:4,fontSize:7,fontWeight:700,color:"#fff",background:"rgba(0,0,0,.55)",padding:"1px 4px",borderRadius:2}}>{p.type}</span>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>}
 
@@ -784,17 +923,129 @@ function DarkProfile({user,posts,metricValues,setEditMetric,setSelPost,followers
       {ptab==="info"&&<>
         <div style={{background:PCARD,padding:"14px 16px",marginTop:8}}>
           <PSec>Contact</PSec>
-          {[["Athlete",user?.email||"andrew@email.com"],["Coach","Coach Marcus Rivera"],["Coach Email","rivera@lincolnhs.edu"],["Coach Phone","(212) 555-0198"]].map(([l,v])=>(
-            <div key={l} style={{padding:"9px 0",borderBottom:`1px solid ${PBD}`}}>
-              <div style={{fontSize:8,color:PTXT3,textTransform:"uppercase",letterSpacing:.7,marginBottom:2}}>{l}</div>
-              <div style={{fontSize:12,color:PTXT,fontWeight:500}}>{v}</div>
+          <div style={{padding:"9px 0",borderBottom:`1px solid ${PBD}`}}>
+            <div style={{fontSize:8,color:PTXT3,textTransform:"uppercase",letterSpacing:.7,marginBottom:2}}>Athlete</div>
+            <div style={{fontSize:12,color:PTXT,fontWeight:500}}>{user?.email||"andrew@email.com"}</div>
+          </div>
+
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 0 8px"}}>
+            <div style={{fontSize:8,color:PTXT3,textTransform:"uppercase",letterSpacing:.7,fontWeight:700}}>Coaches</div>
+            <button
+              onClick={startCoachDraft}
+              disabled={!!coachDraft}
+              style={{display:"inline-flex",alignItems:"center",gap:6,background:"transparent",border:`1px solid ${PBD}`,color:PTXT,fontSize:10,fontWeight:700,padding:"6px 10px",borderRadius:2,cursor:coachDraft?"not-allowed":"pointer",opacity:coachDraft?.55:1}}
+            >
+              <Ic.plus size={12} color={PTXT}/>
+              Add
+            </button>
+          </div>
+
+          {!coachContacts?.length && !coachDraft && (
+            <div style={{fontSize:11,color:PTXT3,marginBottom:6,lineHeight:1.5}}>
+              Optional — add your current coaches (club, academy, high school).
             </div>
-          ))}
+          )}
+
+          {coachDraft && (()=>{
+            const d=coachDraft;
+            const canSave=!!d.name?.trim() && !!d.team?.trim() && !!d.email?.trim();
+            const InSx={padding:"8px 10px",borderRadius:8,fontSize:12};
+            const Lbl={fontSize:10,fontWeight:700,color:PTXT3,textTransform:"uppercase",letterSpacing:.6,marginBottom:6};
+            return (
+              <div style={{borderTop:`1px solid ${PBD}`,paddingTop:10,marginTop:2}}>
+                <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:10,marginBottom:10}}>
+                  <div style={{fontSize:12,fontWeight:800,color:PTXT}}>New coach</div>
+                  <button onClick={cancelCoachDraft} style={{background:"transparent",border:"none",color:PTXT3,fontSize:11,fontWeight:800,cursor:"pointer",padding:0}}>Cancel</button>
+                </div>
+                <div style={{marginBottom:10}}>
+                  <div style={Lbl}>Name</div>
+                  <FIn style={InSx} placeholder="Coach name" value={d.name||""} onChange={e=>setCoachDraft(p=>({...p,name:e.target.value}))}/>
+                </div>
+                <div style={{marginBottom:10}}>
+                  <div style={Lbl}>Team / Program</div>
+                  <FIn style={InSx} placeholder="e.g. NYRB Academy" value={d.team||""} onChange={e=>setCoachDraft(p=>({...p,team:e.target.value}))}/>
+                </div>
+                <div style={{marginBottom:10}}>
+                  <div style={Lbl}>Role (optional)</div>
+                  <FIn style={InSx} placeholder="e.g. Head Coach" value={d.role||""} onChange={e=>setCoachDraft(p=>({...p,role:e.target.value}))}/>
+                </div>
+                <div style={{marginBottom:12}}>
+                  <div style={Lbl}>Email</div>
+                  <FIn style={InSx} placeholder="coach@email.com" value={d.email||""} onChange={e=>setCoachDraft(p=>({...p,email:e.target.value}))}/>
+                </div>
+                <Btn ch="Save coach" full dis={!canSave} sm onClick={saveCoachDraft}/>
+              </div>
+            );
+          })()}
+
+          {(coachContacts||[]).map((c,idx)=>{
+            const open=expandedCoachId===c.id;
+            const title=c.name?.trim()||`Coach ${idx+1}`;
+            const sub=[c.team?.trim(),c.role?.trim()].filter(Boolean).join(" · ");
+            return (
+              <div key={c.id} style={{borderTop:`1px solid ${PBD}`}}>
+                <button
+                  onClick={()=>toggleCoach(c.id)}
+                  style={{width:"100%",display:"flex",alignItems:"center",justifyContent:"space-between",gap:10,padding:"10px 0",background:"transparent",border:"none",cursor:"pointer",textAlign:"left"}}
+                >
+                  <div style={{minWidth:0}}>
+                    <div style={{fontSize:12,fontWeight:700,color:PTXT}}>{title}</div>
+                    {sub && <div style={{fontSize:10,color:PTXT3,marginTop:2,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{sub}</div>}
+                  </div>
+                  <svg width="14" height="14" viewBox="0 0 10 10" fill="none" style={{transform:open?"rotate(180deg)":"rotate(0deg)",transition:"transform .15s"}}>
+                    <path d="M2 3.5L5 6.5L8 3.5" stroke={PTXT3} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </button>
+
+                {open && (
+                  <div style={{padding:"8px 0 12px"}}>
+                    {(()=>{
+                      const d=coachEditDraft||c;
+                      const isEditing=coachEditDraft?.id===c.id;
+                      const canSave=!!d.name?.trim() && !!d.team?.trim() && !!d.email?.trim();
+                      const InSx={padding:"8px 10px",borderRadius:8,fontSize:12};
+                      const Lbl={fontSize:10,fontWeight:700,color:PTXT3,textTransform:"uppercase",letterSpacing:.6,marginBottom:6};
+                      return (
+                        <>
+                          <div style={{marginBottom:10}}>
+                            <div style={Lbl}>Name</div>
+                            <FIn style={InSx} placeholder="Coach name" value={d.name||""} onChange={e=>setCoachEditDraft(p=>({...p,id:c.id,name:e.target.value,team:d.team||"",role:d.role||"",email:d.email||""}))}/>
+                          </div>
+                          <div style={{marginBottom:10}}>
+                            <div style={Lbl}>Team / Program</div>
+                            <FIn style={InSx} placeholder="e.g. NYRB Academy" value={d.team||""} onChange={e=>setCoachEditDraft(p=>({...p,id:c.id,name:d.name||"",team:e.target.value,role:d.role||"",email:d.email||""}))}/>
+                          </div>
+                          <div style={{marginBottom:10}}>
+                            <div style={Lbl}>Role (optional)</div>
+                            <FIn style={InSx} placeholder="e.g. Head Coach" value={d.role||""} onChange={e=>setCoachEditDraft(p=>({...p,id:c.id,name:d.name||"",team:d.team||"",role:e.target.value,email:d.email||""}))}/>
+                          </div>
+                          <div style={{marginBottom:12}}>
+                            <div style={Lbl}>Email</div>
+                            <FIn style={InSx} placeholder="coach@email.com" value={d.email||""} onChange={e=>setCoachEditDraft(p=>({...p,id:c.id,name:d.name||"",team:d.team||"",role:d.role||"",email:e.target.value}))}/>
+                          </div>
+                          <div style={{display:"flex",gap:8,alignItems:"center",marginBottom:10}}>
+                            <Btn ch="Save changes" sm dis={!canSave || !isEditing} onClick={()=>saveCoachEdits(c.id)}/>
+                            <button onClick={cancelCoachEdits} style={{background:"transparent",border:`1px solid ${PBD}`,color:PTXT,fontSize:11,fontWeight:800,padding:"7px 10px",borderRadius:2,cursor:"pointer"}}>Cancel</button>
+                          </div>
+                        </>
+                      );
+                    })()}
+                    <button
+                      onClick={()=>removeCoachContact(c.id)}
+                      style={{background:"rgba(239,68,68,.12)",border:`1px solid rgba(239,68,68,.3)`,color:"#fca5a5",fontSize:11,fontWeight:800,padding:"8px 10px",borderRadius:2,cursor:"pointer"}}
+                    >
+                      Remove coach
+                    </button>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
         <div style={{height:6,background:`linear-gradient(180deg,${PCARD},${PBG})`}}/><PDiv/><div style={{height:6,background:`linear-gradient(180deg,${PBG},${PCARD})`}}/>
         <div style={{background:PCARD,padding:"14px 16px"}}>
           <PSec>Academics</PSec>
-          {[["GPA",user?.gpa||"3.8"],["Grad Year",user?.gradYear||"2027"],["Major","Sports Management"],["NCAA Status","Eligible"]].map(([l,v])=>(
+          {[["GPA",user?.gpa||"3.8"],["Grad Year",user?.gradYear||"2027"],["Major","Sports Management"],["NCAA Status","Eligible"],["Preferred Division","D1 Target"]].map(([l,v])=>(
             <div key={l} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"9px 0",borderBottom:`1px solid ${PBD}`}}>
               <span style={{fontSize:12,color:PTXT2}}>{l}</span>
               <span style={{fontSize:12,fontWeight:700,color:PTXT}}>{v}</span>
@@ -803,10 +1054,154 @@ function DarkProfile({user,posts,metricValues,setEditMetric,setSelPost,followers
         </div>
       </>}
     </div>
-  );
+    {/* ── SCREEN 2: TAPE EDITOR ── */}
+    {tapeEditorOpen&&<div style={{position:"fixed",inset:0,background:"#050505",zIndex:450,display:"flex",flexDirection:"column"}}>
+      <div style={{width:"100%",maxWidth:430,margin:"0 auto",height:"100%",display:"flex",flexDirection:"column"}}>
+        {/* Top bar */}
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"14px 16px",flexShrink:0,borderBottom:"1px solid #1a1a1a"}}>
+          <button onClick={()=>setTapeEditorOpen(false)} style={{background:"none",border:"none",cursor:"pointer",fontSize:13,fontWeight:600,color:PTXT2,padding:0}}>← Back</button>
+          <span style={{fontSize:13,fontWeight:800,color:PTXT,letterSpacing:.5}}>TAPE EDITOR</span>
+          <button onClick={()=>{setTapeEditorOpen(false);}} style={{background:PACC,border:"none",borderRadius:5,padding:"6px 14px",cursor:"pointer",fontSize:12,fontWeight:700,color:"#fff"}}>Save Tape</button>
+        </div>
+        {/* Preview window */}
+        {tape.length>0&&(()=>{const sel=tape[Math.min(tapeEditorSel,tape.length-1)]||tape[0];return(
+          <div style={{flexShrink:0,padding:"16px 16px 0"}}>
+            <div style={{borderRadius:8,overflow:"hidden",position:"relative",aspectRatio:"16/9",background:"#0d1117",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",marginBottom:10}} onClick={()=>{}}>
+              <div style={{position:"absolute",inset:0,background:`linear-gradient(160deg,${sel.thumb||"#1e3a5f"},#0d1117)`}}/>
+              <div style={{position:"absolute",inset:0,background:"rgba(0,0,0,.3)"}}/>
+              <div style={{position:"relative",width:44,height:44,borderRadius:"50%",background:"rgba(217,119,87,.9)",display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 4px 20px rgba(217,119,87,.4)"}}>
+                <svg width={16} height={16} viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21"/></svg>
+              </div>
+              <span style={{position:"absolute",top:8,left:8,fontSize:9,fontWeight:700,color:"rgba(255,255,255,.6)",background:"rgba(0,0,0,.5)",padding:"2px 6px",borderRadius:3}}>{sel.type}</span>
+            </div>
+            <p style={{fontSize:13,fontWeight:700,color:PTXT,margin:"0 0 2px"}}>{sel.title}</p>
+            <p style={{fontSize:11,color:PTXT3,margin:"0 0 10px"}}>{sel.duration}</p>
+            {/* Scrubber */}
+            <div style={{marginBottom:6,position:"relative",height:3,background:"#222",borderRadius:2}}>
+              <div style={{position:"absolute",left:0,top:0,height:"100%",width:"35%",background:PACC,borderRadius:2}}/>
+              <div style={{position:"absolute",left:"35%",top:"50%",transform:"translate(-50%,-50%)",width:10,height:10,borderRadius:"50%",background:PACC,boxShadow:`0 0 6px ${PACC}`}}/>
+            </div>
+            <div style={{display:"flex",justifyContent:"space-between",marginBottom:12}}>
+              <span style={{fontSize:9,color:PTXT3}}>0:00</span>
+              <span style={{fontSize:9,color:PTXT3}}>{sel.duration}</span>
+            </div>
+            {/* Trim handles */}
+            <div style={{position:"relative",height:28,background:"#111",borderRadius:4,border:"1px solid #222",marginBottom:12,display:"flex",alignItems:"center",overflow:"hidden"}}>
+              <div style={{position:"absolute",left:0,top:0,bottom:0,width:16,background:PACC,borderRadius:"4px 0 0 4px",cursor:"ew-resize",display:"flex",alignItems:"center",justifyContent:"center"}}>
+                <svg width={6} height={12} viewBox="0 0 6 12" fill="none"><line x1={2} y1={1} x2={2} y2={11} stroke="#fff" strokeWidth={1.5}/><line x1={4} y1={1} x2={4} y2={11} stroke="#fff" strokeWidth={1.5}/></svg>
+              </div>
+              <div style={{flex:1,height:4,margin:"0 18px",background:"#333",borderRadius:2}}>
+                <div style={{height:"100%",width:"80%",background:"#444",borderRadius:2}}/>
+              </div>
+              <div style={{position:"absolute",right:0,top:0,bottom:0,width:16,background:PACC,borderRadius:"0 4px 4px 0",cursor:"ew-resize",display:"flex",alignItems:"center",justifyContent:"center"}}>
+                <svg width={6} height={12} viewBox="0 0 6 12" fill="none"><line x1={2} y1={1} x2={2} y2={11} stroke="#fff" strokeWidth={1.5}/><line x1={4} y1={1} x2={4} y2={11} stroke="#fff" strokeWidth={1.5}/></svg>
+              </div>
+            </div>
+          </div>
+        );})()}
+        {/* Timeline */}
+        <div style={{flex:1,overflowY:"auto",padding:"0 16px"}}>
+          <p style={{fontSize:9,fontWeight:700,color:PTXT3,letterSpacing:1.2,textTransform:"uppercase",marginBottom:8}}>Timeline — tap to select, use arrows to reorder</p>
+          <div style={{display:"flex",gap:8,overflowX:"auto",paddingBottom:8}}>
+            {tape.map((c,i)=>{const isSel=tapeEditorSel===i;return(
+              <div key={c.id} onClick={()=>setTapeEditorSel(i)} style={{flexShrink:0,width:72,cursor:"pointer"}}>
+                <div style={{position:"relative",width:72,height:72,borderRadius:6,overflow:"hidden",border:isSel?`2px solid ${PACC}`:"2px solid transparent",boxShadow:isSel?`0 0 12px rgba(217,119,87,.5)`:"none",transition:"all .15s"}}>
+                  <div style={{position:"absolute",inset:0,background:`linear-gradient(145deg,${c.thumb},#0d1117)`}}/>
+                  <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center"}}>
+                    <svg width={14} height={14} viewBox="0 0 24 24" fill="rgba(255,255,255,.7)"><polygon points="5 3 19 12 5 21"/></svg>
+                  </div>
+                  <span style={{position:"absolute",bottom:3,right:3,fontSize:7,fontWeight:800,color:"rgba(255,255,255,.8)",background:"rgba(0,0,0,.6)",padding:"1px 4px",borderRadius:2}}>{c.duration}</span>
+                  <button onClick={e=>{e.stopPropagation();setTapeOrder(o=>o.filter(id=>id!==c.id));if(tapeEditorSel>=tape.length-1)setTapeEditorSel(Math.max(0,tape.length-2));}} style={{position:"absolute",top:2,right:2,width:14,height:14,borderRadius:"50%",background:"rgba(0,0,0,.7)",border:"none",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",padding:0}}>
+                    <svg width={7} height={7} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={3}><line x1={18} y1={6} x2={6} y2={18}/><line x1={6} y1={6} x2={18} y2={18}/></svg>
+                  </button>
+                </div>
+                <p style={{fontSize:9,color:isSel?PACC:PTXT3,fontWeight:isSel?700:400,margin:"4px 0 0",textAlign:"center",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>#{i+1}</p>
+              </div>
+            );})}
+            {/* Add button */}
+            <div style={{flexShrink:0,width:72,cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:4}} onClick={()=>{}}>
+              <div style={{width:72,height:72,borderRadius:6,border:`1.5px dashed #333`,display:"flex",alignItems:"center",justifyContent:"center"}}>
+                <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke={PTXT3} strokeWidth={2}><line x1={12} y1={5} x2={12} y2={19}/><line x1={5} y1={12} x2={19} y2={12}/></svg>
+              </div>
+              <p style={{fontSize:9,color:PTXT3,margin:0}}>Add</p>
+            </div>
+          </div>
+        </div>
+        {/* Bottom action bar */}
+        <div style={{flexShrink:0,borderTop:"1px solid #1a1a1a",padding:"10px 16px",display:"flex",gap:8}}>
+          <button disabled={tapeEditorSel===0||tape.length===0} onClick={()=>{if(tape[tapeEditorSel])moveClip(tape[tapeEditorSel].id,"up");setTapeEditorSel(s=>Math.max(0,s-1));}} style={{flex:1,background:"#1a1a1a",border:"1px solid #2a2a2a",borderRadius:6,padding:"9px 0",cursor:tapeEditorSel===0?"default":"pointer",fontSize:12,fontWeight:700,color:tapeEditorSel===0?PTXT3:PTXT,opacity:tapeEditorSel===0?.4:1}}>← Move</button>
+          <button disabled={tape.length===0} onClick={()=>{if(tape[tapeEditorSel]){setTapeOrder(o=>o.filter(id=>id!==tape[tapeEditorSel].id));if(tapeEditorSel>=tape.length-1)setTapeEditorSel(Math.max(0,tape.length-2));}}} style={{flex:1,background:"rgba(239,68,68,.12)",border:"1px solid rgba(239,68,68,.25)",borderRadius:6,padding:"9px 0",cursor:"pointer",fontSize:12,fontWeight:700,color:"#fca5a5"}}>Remove</button>
+          <button disabled={tapeEditorSel>=tape.length-1||tape.length===0} onClick={()=>{if(tape[tapeEditorSel])moveClip(tape[tapeEditorSel].id,"dn");setTapeEditorSel(s=>Math.min(tape.length-1,s+1));}} style={{flex:1,background:"#1a1a1a",border:"1px solid #2a2a2a",borderRadius:6,padding:"9px 0",cursor:tapeEditorSel>=tape.length-1?"default":"pointer",fontSize:12,fontWeight:700,color:tapeEditorSel>=tape.length-1?PTXT3:PTXT,opacity:tapeEditorSel>=tape.length-1?.4:1}}>Move →</button>
+          <button onClick={()=>{setTapePreviewIdx(-1);setTapePreviewOpen(true);}} style={{flex:1,background:"rgba(217,119,87,.15)",border:"1px solid rgba(217,119,87,.3)",borderRadius:6,padding:"9px 0",cursor:"pointer",fontSize:12,fontWeight:700,color:PACC}}>Preview</button>
+        </div>
+      </div>
+    </div>}
+
+    {/* ── SCREEN 3: FULL PREVIEW ── */}
+    {tapePreviewOpen&&<div style={{position:"fixed",inset:0,background:"#000",zIndex:460,display:"flex",flexDirection:"column"}} onClick={()=>setTapePreviewIdx(i=>i+1)}>
+      <div style={{width:"100%",maxWidth:430,margin:"0 auto",height:"100%",position:"relative",display:"flex",flexDirection:"column"}}>
+        {/* Progress bar */}
+        <div style={{position:"absolute",top:0,left:0,right:0,height:3,background:"rgba(255,255,255,.15)",zIndex:2}}>
+          <div style={{height:"100%",width:`${previewProgress}%`,background:PACC,transition:"width .05s linear"}}/>
+        </div>
+        {/* Close button */}
+        <button onClick={e=>{e.stopPropagation();setTapePreviewOpen(false);setTapePreviewIdx(-1);}} style={{position:"absolute",top:16,right:16,zIndex:3,background:"rgba(0,0,0,.6)",border:"1px solid rgba(255,255,255,.2)",borderRadius:6,padding:"6px 12px",cursor:"pointer",fontSize:12,fontWeight:700,color:"rgba(255,255,255,.8)"}}>✕ Close</button>
+        {/* INTRO CARD */}
+        {tapePreviewIdx===-1&&(
+          <div style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"40px 24px",background:"radial-gradient(ellipse at center,#1a0d08 0%,#050505 70%)"}}>
+            <div style={{width:72,height:72,borderRadius:"50%",background:`linear-gradient(135deg,${PACC},${PACC2})`,display:"flex",alignItems:"center",justifyContent:"center",marginBottom:20,boxShadow:`0 0 40px rgba(217,119,87,.4)`}}>
+              <span style={{fontSize:24,fontWeight:800,color:"#fff"}}>{(user?.first||"A")[0]}{(user?.last||"J")[0]}</span>
+            </div>
+            <p style={{fontSize:28,fontWeight:900,color:"#fff",margin:"0 0 6px",letterSpacing:-.5,textAlign:"center"}}>{user?.first||"Andrew"} {user?.last||"Johnson"}</p>
+            <p style={{fontSize:15,color:PACC,fontWeight:700,margin:"0 0 4px",textAlign:"center"}}>{(user?.positions||["Center Back (CB)"]).join(", ")}</p>
+            <p style={{fontSize:13,color:"rgba(255,255,255,.5)",margin:"0 0 24px",textAlign:"center"}}>Class of {user?.gradYear||"2027"} · {user?.school||"Lincoln High School"}, {user?.state||"NY"}</p>
+            <div style={{height:1,width:60,background:`rgba(217,119,87,.4)`,marginBottom:16}}/>
+            <p style={{fontSize:10,color:"rgba(255,255,255,.3)",letterSpacing:.6}}>{tapeSlug}</p>
+          </div>
+        )}
+        {/* CLIP CARD */}
+        {tapePreviewIdx>=0&&tapePreviewIdx<tape.length&&(()=>{const c=tape[tapePreviewIdx];return(
+          <div style={{flex:1,position:"relative",display:"flex",flexDirection:"column"}}>
+            <div style={{flex:1,background:`linear-gradient(160deg,${c.thumb||"#1e3a5f"},#000)`,display:"flex",alignItems:"center",justifyContent:"center"}}>
+              <div style={{width:60,height:60,borderRadius:"50%",background:"rgba(217,119,87,.9)",display:"flex",alignItems:"center",justifyContent:"center",boxShadow:`0 0 30px rgba(217,119,87,.5)`}}>
+                <svg width={22} height={22} viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21"/></svg>
+              </div>
+            </div>
+            <div style={{position:"absolute",top:20,left:16,background:"rgba(0,0,0,.65)",borderRadius:4,padding:"4px 10px"}}>
+              <span style={{fontSize:10,fontWeight:800,color:PACC,letterSpacing:.8,textTransform:"uppercase"}}>{c.type}</span>
+            </div>
+            <div style={{position:"absolute",bottom:0,left:0,right:0,padding:"30px 16px 20px",background:"linear-gradient(0deg,rgba(0,0,0,.9),transparent)"}}>
+              <p style={{fontSize:10,color:"rgba(255,255,255,.4)",margin:"0 0 4px"}}>Clip {tapePreviewIdx+1} of {tape.length}</p>
+              <p style={{fontSize:15,fontWeight:700,color:"#fff",margin:0}}>{c.title} · {c.duration}</p>
+            </div>
+          </div>
+        );})()}
+        {/* END CARD */}
+        {tapePreviewIdx===tape.length&&(
+          <div style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"40px 24px",background:"radial-gradient(ellipse at center,#1a0d08 0%,#050505 70%)"}}>
+            <div style={{width:64,height:64,borderRadius:"50%",background:`linear-gradient(135deg,${PACC},${PACC2})`,display:"flex",alignItems:"center",justifyContent:"center",marginBottom:16,boxShadow:`0 0 32px rgba(217,119,87,.4)`}}>
+              <span style={{fontSize:20,fontWeight:800,color:"#fff"}}>{(user?.first||"A")[0]}{(user?.last||"J")[0]}</span>
+            </div>
+            <p style={{fontSize:22,fontWeight:900,color:"#fff",margin:"0 0 4px",letterSpacing:-.3,textAlign:"center"}}>{user?.first||"Andrew"} {user?.last||"Johnson"}</p>
+            <p style={{fontSize:13,color:"rgba(255,255,255,.5)",margin:"0 0 24px",textAlign:"center"}}>{(user?.positions||["Center Back (CB)"]).join(", ")} · Class of {user?.gradYear||"2027"}</p>
+            <div style={{display:"flex",gap:10,marginBottom:20}}>
+              <button onClick={e=>e.stopPropagation()} style={{background:"rgba(255,255,255,.08)",border:"1px solid rgba(255,255,255,.15)",borderRadius:6,padding:"10px 22px",cursor:"pointer",fontSize:13,fontWeight:700,color:"#fff"}}>Follow</button>
+              <button onClick={e=>e.stopPropagation()} style={{background:PACC,border:"none",borderRadius:6,padding:"10px 22px",cursor:"pointer",fontSize:13,fontWeight:700,color:"#fff"}}>Message</button>
+            </div>
+            <button onClick={e=>{e.stopPropagation();setTapePreviewOpen(false);setTapePreviewIdx(-1);}} style={{background:"none",border:"none",cursor:"pointer",fontSize:13,fontWeight:600,color:PACC}}>View Full Profile →</button>
+          </div>
+        )}
+      </div>
+    </div>}
+  </>);
 }
 
 function AthleteApp({user=null}){
+  useEffect(()=>{
+    // #region agent log
+    fetch('http://127.0.0.1:7282/ingest/8e43e297-ecf0-462e-bc78-418cef0f1596',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'edb537'},body:JSON.stringify({sessionId:'edb537',location:'App.jsx:AthleteApp mount',message:'AthleteApp rendered',data:{hasUser:!!user,role:user?.role??null},timestamp:Date.now(),hypothesisId:'D'})}).catch(()=>{});
+    // #endregion
+  },[user]);
   const[tab,setTab]=useState("profile");
   const[notif,setNotif]=useState(null);
   const[search,setSearch]=useState("");
@@ -825,6 +1220,9 @@ function AthleteApp({user=null}){
   const[selPost,setSelPost]=useState(null);
   const[postOpen,setPostOpen]=useState(false);
   const[newPost,setNewPost]=useState({title:"",desc:"",type:"Highlight"});
+  const[tapeOrder,setTapeOrder]=useState(()=>FILM_POSTS.map(p=>p.id));
+  const[postPhase,setPostPhase]=useState("form");
+  const[pendingPostId,setPendingPostId]=useState(null);
   const[linkCopied,setLinkCopied]=useState(false);const[settingsOpen,setSettingsOpen]=useState(false);const[selCamp,setSelCamp]=useState(null);
   const[viewedThreads,setViewedThreads]=useState({1:true,2:true});// thread ids coach has opened
   const[moveOpen,setMoveOpen]=useState(null);
@@ -849,10 +1247,34 @@ function AthleteApp({user=null}){
   const[nmo,setNmo]=useState(false);
   const[nmSch,setNmSch]=useState(null);
   const[nmTxt,setNmTxt]=useState("");
+  const[aiOpen,setAiOpen]=useState(false);
+  const[aiBroadcast,setAiBroadcast]=useState(false);
+  const[aiSch,setAiSch]=useState(null);
+  const[aiBcList,setAiBcList]=useState([]);
+  const[aiCtx,setAiCtx]=useState("");
+  const[aiStep,setAiStep]=useState(0);
+  const[aiDrafts,setAiDrafts]=useState([]);
+  const[aiEditIdx,setAiEditIdx]=useState(null);
+  const[aiSavedOnly,setAiSavedOnly]=useState(false);
   const msg=useMsgs(SA);
   const[gender,setGender]=useState(()=>localStorage.getItem("ft_gender")||"");
+  const COACH_CONTACTS_KEY="ft_coach_contacts";
+  const[coachContacts,setCoachContacts]=useState(()=>{
+    try{
+      const raw=localStorage.getItem(COACH_CONTACTS_KEY);
+      const parsed=raw?JSON.parse(raw):[];
+      if(!Array.isArray(parsed))return [];
+      return parsed
+        .filter(Boolean)
+        .map(c=>({id:c?.id??Date.now(),name:c?.name||"",team:c?.team||"",role:c?.role||"",email:c?.email||""}));
+    }catch{return [];}
+  });
+  const[expandedCoachId,setExpandedCoachId]=useState(null);
+  const[coachDraft,setCoachDraft]=useState(null);
+  const[coachEditDraft,setCoachEditDraft]=useState(null);
   const[schools,setSchools]=useState([]);
   const[schoolsLoading,setSchoolsLoading]=useState(true);
+  const persistCoachContacts=next=>{try{localStorage.setItem(COACH_CONTACTS_KEY,JSON.stringify(next||[]));}catch{}};
   useEffect(()=>{
     if(!gender){setSchools([]);setSchoolsLoading(false);return;}
     setSchoolsLoading(true);
@@ -863,6 +1285,63 @@ function AthleteApp({user=null}){
     });
   },[gender]);
   const notify=m=>{setNotif(m);setTimeout(()=>setNotif(null),3e3);};
+  const startCoachDraft=()=>{
+    if(coachDraft)return;
+    setCoachDraft({id:Date.now(),name:"",team:"",role:"",email:""});
+    setExpandedCoachId(null);
+    setCoachEditDraft(null);
+  };
+  const cancelCoachDraft=()=>setCoachDraft(null);
+  const saveCoachDraft=()=>{
+    if(!coachDraft)return;
+    const d={...coachDraft,name:(coachDraft.name||"").trim(),team:(coachDraft.team||"").trim(),role:(coachDraft.role||"").trim(),email:(coachDraft.email||"").trim()};
+    if(!d.name||!d.team||!d.email){notify("Add name, team, and email");return;}
+    setCoachContacts(cs=>{
+      const next=[...(cs||[]),d];
+      persistCoachContacts(next);
+      return next;
+    });
+    setCoachDraft(null);
+    notify("Coach saved");
+  };
+  const toggleCoach=id=>{
+    setExpandedCoachId(cur=>{
+      const next=cur===id?null:id;
+      if(next){
+        const c=coachContacts.find(x=>x.id===id);
+        if(c)setCoachEditDraft({...c});
+      }else{
+        setCoachEditDraft(null);
+      }
+      return next;
+    });
+  };
+  const cancelCoachEdits=()=>{
+    setCoachEditDraft(null);
+    setExpandedCoachId(null);
+  };
+  const saveCoachEdits=id=>{
+    const d=coachEditDraft;
+    if(!d||d.id!==id)return;
+    const nextCoach={...d,name:(d.name||"").trim(),team:(d.team||"").trim(),role:(d.role||"").trim(),email:(d.email||"").trim()};
+    if(!nextCoach.name||!nextCoach.team||!nextCoach.email){notify("Add name, team, and email");return;}
+    setCoachContacts(cs=>{
+      const next=(cs||[]).map(c=>c.id===id?nextCoach:c);
+      persistCoachContacts(next);
+      return next;
+    });
+    notify("Coach updated");
+  };
+  const removeCoachContact=id=>{
+    setCoachContacts(cs=>{
+      const next=(cs||[]).filter(c=>c.id!==id);
+      persistCoachContacts(next);
+      return next;
+    });
+    setExpandedCoachId(cur=>cur===id?null:cur);
+    setCoachEditDraft(cur=>cur?.id===id?null:cur);
+    notify("Coach removed");
+  };
   // Auto-advance: when athlete opens a thread where coach has replied → move to Replied
   // When athlete opens any thread → move to Viewed (coach opened email sim)
   const openThread=t=>{
@@ -894,6 +1373,40 @@ function AthleteApp({user=null}){
   const copyE=(e,id)=>{navigator.clipboard?.writeText(e).catch(()=>{});setCopied(id);setTimeout(()=>setCopied(null),2500);notify("Email copied");const s=schools.find(x=>x.id===id);if(s)advanceTo(s,"emailed");};
   const reqCamp=(cid,sch)=>{if(cReqs.includes(cid))return;setCReqs(r=>[...r,cid]);advanceTo(sch,"camped");notify(`Spot requested — ${sch.name} will see your profile`);};
   const moveSt=(sch,from,to)=>{setPip(p=>({...p,[from]:p[from].filter(x=>x.id!==sch.id),[to]:[...p[to],sch]}));setMoveOpen(null);notify(`Moved to ${STG.find(s=>s.id===to).label}`);};
+  const resetAi=()=>{setAiOpen(false);setAiBroadcast(false);setAiSch(null);setAiBcList([]);setAiCtx("");setAiStep(0);setAiDrafts([]);setAiEditIdx(null);setAiSavedOnly(false);};
+  const genDraft=(sch,u,ctx)=>{
+    const coachFirst=(sch.coach||"Coach").split(" ")[0];
+    const coachLast=(sch.coach||"Coach").split(" ").slice(-1)[0];
+    const pos=(u?.positions||["athlete"])[0];
+    const ctxPara=ctx?.trim()||`I have been following your program closely and am impressed by the culture and development your coaching staff provides to student-athletes.`;
+    return `Dear Coach ${coachFirst},\n\nMy name is ${u?.first||"Andrew"} ${u?.last||"Johnson"}, a Class of ${u?.gradYear||"2027"} ${pos} from ${u?.school||"Lincoln High School"}, ${u?.state||"NY"}. I'm reaching out because I'm very interested in ${sch.name}'s ${sch.div} program.\n\n${ctxPara}\n\nI'd love the opportunity to learn more about your program and explore how I might be a fit. I've included my recruiting profile for your review.\n\nThank you for your time, Coach ${coachLast}.\n\n${u?.first||"Andrew"} ${u?.last||"Johnson"}\nClass of ${u?.gradYear||"2027"} | ${pos} | ${u?.school||"Lincoln High School"}`;
+  };
+  const launchAI=()=>{
+    const ids=aiBroadcast?aiBcList:[aiSch];
+    if(!ids.length||ids.some(id=>!id)){notify(aiBroadcast?"Select at least one school":"Select a school");return;}
+    setAiStep(1);
+    setTimeout(()=>{
+      setAiDrafts(ids.map(id=>({schoolId:id,text:genDraft(schools.find(s=>s.id===id),user,aiCtx)})));
+      setAiStep(2);
+    },aiBroadcast?2000:1500);
+  };
+  const sendAiDrafts=()=>{
+    const now=new Date();
+    const ts=`${now.toLocaleDateString("en-US",{month:"short",day:"numeric"})}, ${now.toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"})}`;
+    const draftsSnap=[...aiDrafts];
+    draftsSnap.forEach(({schoolId,text})=>{
+      const sch=schools.find(s=>s.id===schoolId);if(!sch)return;
+      const m={id:Date.now()+schoolId,from:"athlete",text,time:ts};
+      const ex=msg.threads.find(t=>t.schoolId===sch.id);
+      if(ex){msg.setT(ts=>ts.map(t=>t.id===ex.id?{...t,msgs:[...t.msgs,m]}:t));}
+      else{const t={id:Date.now()+schoolId,schoolId:sch.id,cName:sch.coach||sch.name,school:sch.name,cEmail:sch.email||"",unread:0,msgs:[m]};msg.setT(ts=>[t,...ts]);}
+      if(!inP(sch.id))addTo(sch,"emailed");
+    });
+    const count=draftsSnap.length;
+    const firstName=schools.find(s=>s.id===draftsSnap[0]?.schoolId)?.coach||"coach";
+    resetAi();setTab("messages");
+    notify(count===1?`Sent to ${firstName}`:`Sent to ${count} coaches`);
+  };
   const startMsg=()=>{
     if(!nmSch||!nmTxt.trim())return;
     const sch=schools.find(s=>s.id===nmSch);const ex=msg.threads.find(t=>t.schoolId===sch.id);
@@ -922,7 +1435,7 @@ function AthleteApp({user=null}){
   return <div style={{display:"flex",flexDirection:"column",height:"100vh",background:GR,overflow:"hidden",textAlign:"left"}}>
     <style>{CSS}</style>
     {!gender&&<div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.55)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:9999,padding:16}}>
-      <div style={{width:"min(520px, 100%)",background:W,border:`1px solid ${BD}`,borderRadius:14,padding:18,boxShadow:"0 24px 70px rgba(0,0,0,.25)"}}>
+      <div style={{width:"min(430px, 100%)",background:W,border:`1px solid ${BD}`,borderRadius:14,padding:18,boxShadow:"0 24px 70px rgba(0,0,0,.25)"}}>
         <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:10}}>
           <Logo sz={26} purple/>
           <div>
@@ -955,12 +1468,25 @@ function AthleteApp({user=null}){
     <div style={{flex:1,overflowY:"auto",display:"flex",flexDirection:"column"}}>
       {/* PROFILE */}
       {tab==="profile"&&<DarkProfile
-        user={user} posts={posts} metricValues={metricValues}
+        user={user} posts={posts} tapeOrder={tapeOrder} setTapeOrder={setTapeOrder} metricValues={metricValues}
         setEditMetric={setEditMetric} setSelPost={setSelPost}
         followers={followers} following={following}
         followReqs={followReqs} accepted={accepted}
         setFollowOpen={setFollowOpen} setTab={setTab}
         setEditOpen={setEditOpen}
+        coachContacts={coachContacts}
+        removeCoachContact={removeCoachContact}
+        coachDraft={coachDraft}
+        setCoachDraft={setCoachDraft}
+        startCoachDraft={startCoachDraft}
+        saveCoachDraft={saveCoachDraft}
+        cancelCoachDraft={cancelCoachDraft}
+        expandedCoachId={expandedCoachId}
+        toggleCoach={toggleCoach}
+        coachEditDraft={coachEditDraft}
+        setCoachEditDraft={setCoachEditDraft}
+        saveCoachEdits={saveCoachEdits}
+        cancelCoachEdits={cancelCoachEdits}
       />}
 
             {/* SCHOOLS */}
@@ -1048,7 +1574,10 @@ function AthleteApp({user=null}){
       {tab==="messages"&&!msg.active&&<div className="fade" style={{flex:1}}>
         <div style={{background:W,padding:"12px 17px",borderBottom:`1px solid ${BD}`,display:"flex",alignItems:"center",justifyContent:"space-between",position:"sticky",top:0,zIndex:10}}>
           <div><p style={{fontSize:13,fontWeight:700,color:T,margin:0,marginBottom:1}}>Messages</p><p style={{fontSize:11,color:TL,margin:0}}>Connected to your email · syncs both ways</p></div>
-          <Btn ch="New Message" sm onClick={()=>setNmo(true)}/>
+          <div style={{display:"flex",gap:7}}>
+            <Btn ch="AI Draft" sm v="o" onClick={()=>{resetAi();setAiOpen(true);}}/>
+            <Btn ch="New Message" sm onClick={()=>setNmo(true)}/>
+          </div>
         </div>
         <div style={{background:BL,borderBottom:`1px solid ${BR}`,padding:"7px 17px",display:"flex",alignItems:"center",gap:6}}><Ic.mail size={12} active/><p style={{fontSize:11,color:"#C4622A",margin:0}}>Sending from <strong>{aEmail}</strong></p></div>
         {!msg.threads.length&&<div style={{padding:"36px 17px",textAlign:"center"}}><p style={{fontSize:13,fontWeight:700,color:T,marginBottom:4}}>No messages yet</p><Btn ch="Message a Coach" onClick={()=>setNmo(true)}/></div>}
@@ -1141,7 +1670,7 @@ function AthleteApp({user=null}){
 
     {/* CAMP DETAIL SHEET */}
     {selCamp&&<div onClick={e=>{if(e.target===e.currentTarget)setSelCamp(null)}} style={{position:"fixed",inset:0,background:"rgba(17,24,39,.5)",zIndex:300,display:"flex",alignItems:"flex-end",backdropFilter:"blur(6px)"}}>
-      <div style={{background:W,borderRadius:"16px 16px 0 0",width:"100%",maxHeight:"88vh",overflowY:"auto",boxShadow:"0 -4px 32px rgba(0,0,0,.12)"}}>
+      <div style={{background:W,borderRadius:"16px 16px 0 0",width:"100%",maxWidth:430,margin:"0 auto",maxHeight:"88vh",overflowY:"auto",boxShadow:"0 -4px 32px rgba(0,0,0,.12)"}}>
         {/* Handle */}
         <div style={{width:36,height:4,background:BD,borderRadius:2,margin:"12px auto 0"}}/>
         {/* Camp hero */}
@@ -1241,6 +1770,149 @@ function AthleteApp({user=null}){
       {cur&&<Pill ch="Current" color={B} bg={BL}/>}
     </div>;})}/>
 
+    {/* AI DRAFT PANEL */}
+    {aiOpen&&<div style={{position:"fixed",inset:0,background:"#050505",zIndex:400}}>
+      <div style={{width:"100%",maxWidth:430,height:"100%",margin:"0 auto",background:W,display:"flex",flexDirection:"column"}}>
+        {/* Top bar */}
+        <div style={{background:W,borderBottom:`1px solid ${BD}`,padding:"0 16px",height:56,display:"flex",alignItems:"center",justifyContent:"space-between",flexShrink:0}}>
+          <button onClick={resetAi} style={{background:"none",border:"none",cursor:"pointer",display:"flex",alignItems:"center",gap:6,padding:0}}>
+            <Ic.back size={18} color={B}/><span style={{fontSize:13,fontWeight:600,color:B}}>Messages</span>
+          </button>
+          <span style={{fontSize:14,fontWeight:700,color:T}}>AI Draft</span>
+          <div style={{width:72}}/>
+        </div>
+        {/* Mode toggle — step 0 & 1 only */}
+        {aiStep<2&&<div style={{padding:"14px 16px 0",flexShrink:0}}>
+          <div style={{display:"flex",background:GR,border:`1px solid ${BD}`,borderRadius:8,padding:3}}>
+            {[["single","Single School"],["broadcast","Broadcast"]].map(([mode,label])=>{
+              const on=(mode==="broadcast")===aiBroadcast;
+              return <button key={mode} onClick={()=>{setAiBroadcast(mode==="broadcast");setAiSch(null);setAiBcList([]);setAiStep(0);setAiDrafts([]);}}
+                style={{flex:1,padding:"7px 0",borderRadius:6,border:"none",background:on?W:"transparent",color:on?T:TM,fontSize:12,fontWeight:on?700:500,cursor:"pointer",boxShadow:on?"0 1px 3px rgba(0,0,0,.08)":"none",transition:"all .15s"}}>
+                {label}
+              </button>;
+            })}
+          </div>
+        </div>}
+        <div style={{flex:1,overflowY:"auto",padding:"16px 16px 40px"}}>
+
+          {/* ── STEP 0: SETUP ── */}
+          {aiStep===0&&<>
+            {/* All / Saved toggle */}
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10}}>
+              <p style={{fontSize:12,fontWeight:600,color:T,margin:0}}>School{aiBroadcast?"s":""}</p>
+              <div style={{display:"flex",background:GR,border:`1px solid ${BD}`,borderRadius:6,padding:2}}>
+                {[["all","All"],["saved","Saved"]].map(([mode,label])=>{
+                  const on=mode==="saved"?aiSavedOnly:!aiSavedOnly;
+                  const savedCount=allT.length;
+                  return <button key={mode} onClick={()=>{setAiSavedOnly(mode==="saved");setAiSch(null);setAiBcList([]);}}
+                    style={{padding:"4px 10px",borderRadius:4,border:"none",background:on?W:"transparent",color:on?B:TM,fontSize:11,fontWeight:on?700:500,cursor:"pointer",boxShadow:on?"0 1px 2px rgba(0,0,0,.08)":"none",transition:"all .12s",whiteSpace:"nowrap"}}>
+                    {label}{mode==="saved"&&savedCount>0?` (${savedCount})`:""}</button>;
+                })}
+              </div>
+            </div>
+            {aiSavedOnly&&allT.length===0&&<div style={{background:GR,border:`1px solid ${BD}`,borderRadius:6,padding:"12px 14px",marginBottom:14,textAlign:"center"}}>
+              <p style={{fontSize:12,color:TM,margin:0}}>No saved schools yet — save schools from the Schools tab first.</p>
+            </div>}
+            {(!aiSavedOnly||allT.length>0)&&<>
+            {!aiBroadcast&&<>
+              <FSel value={aiSch||""} onChange={e=>setAiSch(Number(e.target.value))} ch={[<option key="" value="" disabled>Select a school…</option>,...(aiSavedOnly?schools.filter(s=>inP(s.id)):schools).map(s=><option key={s.id} value={s.id}>{s.name} ({s.div} · {s.state})</option>)]} style={{marginBottom:12}}/>
+              {aiSch&&(()=>{const s=schools.find(x=>x.id===aiSch);return s?<div style={{background:BL,border:`1px solid ${BR}`,borderRadius:6,padding:"9px 12px",marginBottom:16,display:"flex",gap:10,alignItems:"center"}}>
+                <div style={{width:32,height:32,borderRadius:"50%",background:BR,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:700,color:B,flexShrink:0}}>{s.name.split(" ").map(n=>n[0]).join("").slice(0,2)}</div>
+                <div><p style={{fontSize:12,fontWeight:700,color:T,margin:0}}>{s.name}</p><p style={{fontSize:11,color:TM,margin:0}}>{s.div} · {s.conf} · {s.coach||"Coach TBD"}</p></div>
+              </div>:null;})()}
+            </>}
+            {aiBroadcast&&<>
+              <div style={{border:`1px solid ${BD}`,borderRadius:8,overflow:"hidden",marginBottom:aiBcList.length?8:16,maxHeight:240,overflowY:"auto"}}>
+                {(aiSavedOnly?schools.filter(s=>inP(s.id)):schools).map(s=>{
+                  const on=aiBcList.includes(s.id);
+                  return <div key={s.id} onClick={()=>setAiBcList(l=>on?l.filter(id=>id!==s.id):[...l,s.id])}
+                    style={{display:"flex",alignItems:"center",gap:12,padding:"11px 14px",borderBottom:`1px solid ${BD}`,cursor:"pointer",background:on?BL:W,transition:"background .1s"}}>
+                    <div style={{width:18,height:18,borderRadius:4,border:`2px solid ${on?B:BD}`,background:on?B:"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,transition:"all .12s"}}>
+                      {on&&<svg width={10} height={10} viewBox="0 0 24 24" fill="none" stroke={W} strokeWidth={3} strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>}
+                    </div>
+                    <div style={{flex:1,minWidth:0}}>
+                      <p style={{fontSize:12,fontWeight:600,color:on?B:T,margin:0,marginBottom:1}}>{s.name}</p>
+                      <p style={{fontSize:10,color:TM,margin:0}}>{s.coach||"Coach TBD"} · {s.div} · {s.state}</p>
+                    </div>
+                  </div>;
+                })}
+              </div>
+              {aiBcList.length>0&&<p style={{fontSize:11,color:B,fontWeight:600,marginBottom:16}}>{aiBcList.length} school{aiBcList.length!==1?"s":""} selected</p>}
+            </>}
+            </>}
+            <FL label="Context" hint="(optional)" ch={<div style={{border:`1.5px solid ${BD}`,borderRadius:8,padding:"9px 12px"}} onFocus={e=>e.currentTarget.style.borderColor=B} onBlur={e=>e.currentTarget.style.borderColor=BD}>
+              <textarea rows={4} placeholder="Share anything that will help — recent highlights, why this school interests you, your stats, upcoming events…" value={aiCtx} onChange={e=>setAiCtx(e.target.value)} style={{background:"transparent",width:"100%",border:"none",outline:"none",fontSize:13,color:T,lineHeight:1.6,fontFamily:"inherit"}}/>
+            </div>}/>
+            <div style={{background:BL,border:`1px solid ${BR}`,borderRadius:6,padding:"8px 12px",marginBottom:16,display:"flex",gap:6}}>
+              <Ic.info size={12} active/><p style={{fontSize:11,color:"#C4622A",margin:0,lineHeight:1.5}}>A personalized draft will be generated for each school using your profile and optional context.</p>
+            </div>
+            <Btn ch={aiBroadcast?"Generate Drafts →":"Generate Draft →"} full dis={aiBroadcast?aiBcList.length===0:!aiSch} onClick={launchAI}/>
+          </>}
+
+          {/* ── STEP 1: GENERATING ── */}
+          {aiStep===1&&<div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",minHeight:320,gap:16}}>
+            <div style={{width:52,height:52,borderRadius:"50%",background:BL,border:`2px solid ${BR}`,display:"flex",alignItems:"center",justifyContent:"center"}}>
+              <svg width={24} height={24} viewBox="0 0 24 24" fill="none" stroke={B} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                <line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/>
+                <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite"/>
+              </svg>
+            </div>
+            <div style={{textAlign:"center"}}>
+              <p style={{fontSize:14,fontWeight:700,color:T,margin:0,marginBottom:4}}>{aiBroadcast?`Generating ${aiBcList.length} draft${aiBcList.length!==1?"s":""}…`:"Generating your draft…"}</p>
+              <p style={{fontSize:12,color:TM,margin:0}}>Personalizing for each coach</p>
+            </div>
+          </div>}
+
+          {/* ── STEP 2: PREVIEW & EDIT ── */}
+          {aiStep===2&&<>
+            <div style={{marginBottom:14,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+              <p style={{fontSize:13,fontWeight:700,color:T,margin:0}}>{aiBroadcast?`${aiDrafts.length} Draft${aiDrafts.length!==1?"s":""} Ready`:"Your Draft"}</p>
+              <button onClick={()=>{setAiStep(0);setAiDrafts([]);}} style={{background:"none",border:"none",cursor:"pointer",fontSize:12,color:TM,fontWeight:500,padding:0}}>Edit Setup</button>
+            </div>
+            {/* Single mode */}
+            {!aiBroadcast&&aiDrafts[0]&&<>
+              <div style={{border:`1.5px solid ${BD}`,borderRadius:8,padding:"12px 14px",marginBottom:14}} onFocus={e=>e.currentTarget.style.borderColor=B} onBlur={e=>e.currentTarget.style.borderColor=BD} tabIndex={-1}>
+                <textarea rows={14} value={aiDrafts[0].text} onChange={e=>setAiDrafts([{...aiDrafts[0],text:e.target.value}])} style={{background:"transparent",width:"100%",border:"none",outline:"none",fontSize:13,color:T,lineHeight:1.65,fontFamily:"inherit"}}/>
+              </div>
+              <div style={{background:BL,border:`1px solid ${BR}`,borderRadius:6,padding:"8px 12px",marginBottom:14,display:"flex",gap:6}}>
+                <Ic.info size={12} active/><p style={{fontSize:11,color:"#C4622A",margin:0}}>Edit freely — this is your message, the AI just got you started.</p>
+              </div>
+              <Btn ch="Send Message" full dis={!aiDrafts[0].text.trim()} onClick={sendAiDrafts}/>
+            </>}
+            {/* Broadcast mode */}
+            {aiBroadcast&&<>
+              {aiDrafts.map(({schoolId,text},idx)=>{
+                const s=schools.find(x=>x.id===schoolId);if(!s)return null;
+                const editing=aiEditIdx===idx;
+                const init=s.name.split(" ").map(n=>n[0]).join("").slice(0,2);
+                return <div key={schoolId} style={{border:`1.5px solid ${editing?B:BD}`,borderRadius:10,marginBottom:12,overflow:"hidden",transition:"border-color .15s"}}>
+                  <div style={{display:"flex",alignItems:"center",gap:10,padding:"11px 14px",background:editing?BL:GR,borderBottom:`1px solid ${editing?BR:BD}`}}>
+                    <div style={{width:32,height:32,borderRadius:"50%",background:editing?BR:BD,display:"flex",alignItems:"center",justifyContent:"center",fontSize:10,fontWeight:700,color:editing?B:TM,flexShrink:0}}>{init}</div>
+                    <div style={{flex:1,minWidth:0}}>
+                      <p style={{fontSize:12,fontWeight:700,color:T,margin:0}}>To: {s.coach||"Coach"}</p>
+                      <p style={{fontSize:10,color:TM,margin:0,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{s.name} · {s.div} · {s.conf}</p>
+                    </div>
+                    <button onClick={()=>setAiEditIdx(editing?null:idx)} style={{background:"none",border:`1px solid ${editing?B:BD}`,borderRadius:5,padding:"4px 9px",cursor:"pointer",fontSize:11,fontWeight:600,color:editing?B:TM,flexShrink:0}}>{editing?"Done":"Edit"}</button>
+                  </div>
+                  <div style={{padding:"10px 14px",background:W}}>
+                    {editing
+                      ?<textarea rows={10} autoFocus value={text} onChange={e=>setAiDrafts(ds=>ds.map((d,i)=>i===idx?{...d,text:e.target.value}:d))} style={{background:"transparent",width:"100%",border:"none",outline:"none",fontSize:12,color:T,lineHeight:1.65,fontFamily:"inherit"}}/>
+                      :<p style={{fontSize:12,color:TM,margin:0,lineHeight:1.65,whiteSpace:"pre-wrap",maxHeight:100,overflow:"hidden",WebkitMaskImage:"linear-gradient(180deg,#000 50%,transparent)"}}>{text}</p>
+                    }
+                  </div>
+                </div>;
+              })}
+              <div style={{marginTop:4,marginBottom:14,background:BL,border:`1px solid ${BR}`,borderRadius:6,padding:"8px 12px",display:"flex",gap:6}}>
+                <Ic.info size={12} active/><p style={{fontSize:11,color:"#C4622A",margin:0}}>Each message is personalized. Tap Edit on any card to modify before sending.</p>
+              </div>
+              <Btn ch={`Send to ${aiDrafts.length} School${aiDrafts.length!==1?"s":""}`} full dis={aiDrafts.some(d=>!d.text.trim())} onClick={sendAiDrafts}/>
+            </>}
+          </>}
+
+        </div>
+      </div>
+    </div>}
+
     {/* NEW MESSAGE SHEET */}
     <Sheet open={nmo} onClose={()=>{setNmo(false);setNmSch(null);setNmTxt("");}} title="New Message" ch={<>
       <FL label="To" ch={<><FSel ch={[<option key="" value="" disabled>Select a school…</option>,...schools.map(s=><option key={s.id} value={s.id}>{s.name} ({s.div} · {s.state})</option>)]} value={nmSch||""} onChange={e=>setNmSch(Number(e.target.value))}/>{nmSch&&<p style={{fontSize:11,color:TM,marginTop:4}}>You can connect with <span style={{color:B,fontWeight:600}}>{schools.find(s=>s.id===nmSch)?.name}</span></p>}</>}/>
@@ -1297,7 +1969,7 @@ function AthleteApp({user=null}){
               Share Clip
             </button>
           </div>
-          <button onClick={()=>{setPosts(ps=>ps.filter(p=>p.id!==selPost.id));setSelPost(null);notify("Clip removed");}}
+          <button onClick={()=>{setPosts(ps=>ps.filter(p=>p.id!==selPost.id));setTapeOrder(o=>o.filter(id=>id!==selPost.id));setSelPost(null);notify("Clip removed");}}
             style={{width:"100%",marginTop:8,background:"rgba(239,68,68,.15)",border:"1px solid rgba(239,68,68,.3)",borderRadius:4,padding:"10px 0",cursor:"pointer",fontSize:12,fontWeight:700,color:"#fca5a5"}}>
             Remove Clip
           </button>
@@ -1307,29 +1979,80 @@ function AthleteApp({user=null}){
     </div>}
 
     {/* POST NEW CLIP SHEET */}
-    <Sheet open={postOpen} onClose={()=>setPostOpen(false)} title="Post a Clip" sub="Share a highlight or full tape to your profile" ch={<>
-      {/* Upload area */}
-      <div onClick={()=>notify("Video upload ready at launch")} style={{border:`1.5px dashed ${BD}`,borderRadius:6,padding:"28px 20px",textAlign:"center",cursor:"pointer",marginBottom:16,transition:"all .2s"}} onMouseEnter={e=>{e.currentTarget.style.borderColor=B;e.currentTarget.style.background=BL}} onMouseLeave={e=>{e.currentTarget.style.borderColor=BD;e.currentTarget.style.background=W}}>
-        <div style={{width:46,height:46,background:BL,border:`1px solid ${BR}`,borderRadius:6,display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 11px"}}>
-          <Ic.film size={22} active/>
-        </div>
-        <p style={{fontSize:14,fontWeight:700,color:T,margin:0,marginBottom:3}}>Upload Video</p>
-        <p style={{fontSize:12,color:TM,margin:0}}>{user?.sport==="Soccer"?"Full match video or highlights — MP4, MOV up to 2GB":"MP4, MOV — up to 500 MB"}</p>
-        <div style={{marginTop:12,display:"inline-block",background:B,color:W,padding:"8px 22px",borderRadius:4,fontSize:12,fontWeight:700}}>Choose File</div>
-      </div>
-      <FL label="Clip Title" ch={<FIn placeholder="e.g. Game-Winner vs Lincoln HS" value={newPost.title} onChange={e=>setNewPost(p=>({...p,title:e.target.value}))}/>}/>
-      <FL label="Description" ch={<div style={{border:`1.5px solid ${BD}`,borderRadius:4,padding:"9px 12px"}} onFocus={e=>e.currentTarget.style.borderColor=B} onBlur={e=>e.currentTarget.style.borderColor=BD}><textarea rows={3} placeholder="What happened in this clip? What does it show?" value={newPost.desc} onChange={e=>setNewPost(p=>({...p,desc:e.target.value}))} style={{background:"transparent",width:"100%",border:"none",outline:"none",fontSize:13,color:T}}/></div>}/>
-      <FL label="Clip Type" ch={<FSel ch={(user?.sport==="Soccer"?["Highlight","Full Match","Training Clip","Defensive Clip","Attacking Play","Set Piece","Goals Reel","Assists Reel"]:["Highlight","Game Clip","Tape","Defense","Scoring","Passing","IQ"]).map(t=><option key={t}>{t}</option>)} value={newPost.type} onChange={e=>setNewPost(p=>({...p,type:e.target.value}))}/>}/>
-      <div style={{background:BL,border:`1px solid ${BR}`,borderRadius:4,padding:"8px 12px",marginBottom:16,display:"flex",gap:6}}>
-        <Ic.info size={12} active/>
-        <p style={{fontSize:11,color:"#C4622A",margin:0,lineHeight:1.5}}>This clip will appear on your public profile at <strong>fasttrack.app/{slug}</strong> and be visible to all coaches.</p>
-      </div>
-      <Btn ch="Post to Profile" full dis={!newPost.title.trim()} onClick={()=>{
-        const colors=["#1e3a5f","#C4622A","#1e3a8a","#172554","#1d4ed8","#2563eb"];
-        const p={id:Date.now(),title:newPost.title,desc:newPost.desc||"New clip posted.",type:newPost.type,date:new Date().toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}),views:0,likes:0,duration:"0:30",thumb:colors[Math.floor(Math.random()*colors.length)],featured:false};
-        setPosts(ps=>[p,...ps]);setPostOpen(false);setNewPost({title:"",desc:"",type:"Highlight"});notify("Clip posted to your profile!");
-      }}/>
-    </>}/>
+    {(()=>{
+      const closePost=()=>{setPostOpen(false);setPostPhase("form");setPendingPostId(null);setNewPost({title:"",desc:"",type:"Highlight"});};
+      return <Sheet open={postOpen} onClose={closePost}
+        title={postPhase==="form"?"Post a Clip":"Clip Posted!"}
+        sub={postPhase==="form"?"Share a highlight or full tape to your profile":"Add it to your Highlight Tape?"}
+        ch={postPhase==="form"?(<>
+          <div onClick={()=>notify("Video upload ready at launch")} style={{border:`1.5px dashed ${BD}`,borderRadius:6,padding:"28px 20px",textAlign:"center",cursor:"pointer",marginBottom:16,transition:"all .2s"}} onMouseEnter={e=>{e.currentTarget.style.borderColor=B;e.currentTarget.style.background=BL}} onMouseLeave={e=>{e.currentTarget.style.borderColor=BD;e.currentTarget.style.background=W}}>
+            <div style={{width:46,height:46,background:BL,border:`1px solid ${BR}`,borderRadius:6,display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 11px"}}>
+              <Ic.film size={22} active/>
+            </div>
+            <p style={{fontSize:14,fontWeight:700,color:T,margin:0,marginBottom:3}}>Upload Video</p>
+            <p style={{fontSize:12,color:TM,margin:0}}>{user?.sport==="Soccer"?"Full match video or highlights — MP4, MOV up to 2GB":"MP4, MOV — up to 500 MB"}</p>
+            <div style={{marginTop:12,display:"inline-block",background:B,color:W,padding:"8px 22px",borderRadius:4,fontSize:12,fontWeight:700}}>Choose File</div>
+          </div>
+          <FL label="Clip Title" ch={<FIn placeholder="e.g. Game-Winner vs Lincoln HS" value={newPost.title} onChange={e=>setNewPost(p=>({...p,title:e.target.value}))}/>}/>
+          <FL label="Description" ch={<div style={{border:`1.5px solid ${BD}`,borderRadius:4,padding:"9px 12px"}} onFocus={e=>e.currentTarget.style.borderColor=B} onBlur={e=>e.currentTarget.style.borderColor=BD}><textarea rows={3} placeholder="What happened in this clip? What does it show?" value={newPost.desc} onChange={e=>setNewPost(p=>({...p,desc:e.target.value}))} style={{background:"transparent",width:"100%",border:"none",outline:"none",fontSize:13,color:T}}/></div>}/>
+          <FL label="Clip Type" ch={<FSel ch={(user?.sport==="Soccer"?["Highlight","Full Match","Training Clip","Defensive Clip","Attacking Play","Set Piece","Goals Reel","Assists Reel"]:["Highlight","Game Clip","Tape","Defense","Scoring","Passing","IQ"]).map(t=><option key={t}>{t}</option>)} value={newPost.type} onChange={e=>setNewPost(p=>({...p,type:e.target.value}))}/>}/>
+          <div style={{background:BL,border:`1px solid ${BR}`,borderRadius:4,padding:"8px 12px",marginBottom:16,display:"flex",gap:6}}>
+            <Ic.info size={12} active/>
+            <p style={{fontSize:11,color:"#C4622A",margin:0,lineHeight:1.5}}>This clip will appear on your public profile at <strong>fasttrack.app/{slug}</strong> and be visible to all coaches.</p>
+          </div>
+          <Btn ch="Post to Profile" full dis={!newPost.title.trim()} onClick={()=>{
+            const colors=["#1e3a5f","#C4622A","#1e3a8a","#172554","#1d4ed8","#2563eb"];
+            const newId=Date.now();
+            const p={id:newId,title:newPost.title,desc:newPost.desc||"New clip posted.",type:newPost.type,date:new Date().toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}),views:0,likes:0,duration:"0:30",thumb:colors[Math.floor(Math.random()*colors.length)],featured:false};
+            setPosts(ps=>[p,...ps]);
+            setPendingPostId(newId);
+            setPostPhase("tape");
+            notify("Clip posted to your profile!");
+          }}/>
+        </>):(
+          <>
+            {/* Success check */}
+            <div style={{textAlign:"center",padding:"8px 0 20px"}}>
+              <div style={{width:52,height:52,borderRadius:"50%",background:"rgba(0,135,90,.15)",border:"1.5px solid rgba(87,217,163,.3)",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 12px"}}>
+                <svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="#57d9a3" strokeWidth={2.5}><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <p style={{fontSize:15,fontWeight:800,color:T,margin:"0 0 4px"}}>Posted to Media!</p>
+              <p style={{fontSize:12,color:TM,margin:0,lineHeight:1.5}}>Your tape is what coaches open when they get your link. Add this clip?</p>
+            </div>
+            {/* Tape prompt options */}
+            <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:16}}>
+              <button onClick={()=>{setTapeOrder(o=>[pendingPostId,...o]);closePost();notify("Added to beginning of tape!");}} style={{background:GR,border:`1.5px solid ${BD}`,borderRadius:8,padding:"13px 16px",cursor:"pointer",textAlign:"left",display:"flex",alignItems:"center",gap:12}}>
+                <div style={{width:36,height:36,borderRadius:6,background:BL,border:`1px solid ${BR}`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+                  <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke={B} strokeWidth={2.5}><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+                </div>
+                <div>
+                  <p style={{fontSize:13,fontWeight:700,color:T,margin:0}}>Add to Beginning</p>
+                  <p style={{fontSize:11,color:TM,margin:0}}>This clip plays first — great for your best highlight</p>
+                </div>
+              </button>
+              <button onClick={()=>{setTapeOrder(o=>[...o,pendingPostId]);closePost();notify("Added to end of tape!");}} style={{background:GR,border:`1.5px solid ${BD}`,borderRadius:8,padding:"13px 16px",cursor:"pointer",textAlign:"left",display:"flex",alignItems:"center",gap:12}}>
+                <div style={{width:36,height:36,borderRadius:6,background:BL,border:`1px solid ${BR}`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+                  <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke={B} strokeWidth={2.5}><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg>
+                </div>
+                <div>
+                  <p style={{fontSize:13,fontWeight:700,color:T,margin:0}}>Add to End</p>
+                  <p style={{fontSize:11,color:TM,margin:0}}>Appended after your current clips</p>
+                </div>
+              </button>
+              <button onClick={()=>{setTapeOrder(o=>[...o,pendingPostId]);closePost();setTab("profile");notify("Clip added — open Tape Editor to place it");}} style={{background:GR,border:`1.5px solid ${BD}`,borderRadius:8,padding:"13px 16px",cursor:"pointer",textAlign:"left",display:"flex",alignItems:"center",gap:12}}>
+                <div style={{width:36,height:36,borderRadius:6,background:BL,border:`1px solid ${BR}`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+                  <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke={B} strokeWidth={2.5}><line x1={12} y1={5} x2={12} y2={19}/><line x1={5} y1={12} x2={19} y2={12}/></svg>
+                </div>
+                <div>
+                  <p style={{fontSize:13,fontWeight:700,color:T,margin:0}}>Place Manually</p>
+                  <p style={{fontSize:11,color:TM,margin:0}}>Opens the Tape Editor so you can drag it where you want</p>
+                </div>
+              </button>
+            </div>
+            <button onClick={closePost} style={{width:"100%",background:"none",border:"none",cursor:"pointer",fontSize:13,color:TM,padding:"8px 0",fontWeight:500}}>No thanks, maybe later</button>
+          </>
+        )}/>;
+    })()}
 
     {/* FOLLOW SHEET */}
     {followOpen&&(()=>{
@@ -1361,7 +2084,7 @@ function AthleteApp({user=null}){
       const TABS=["search","followers","following","requests"];
       return(
       <div onClick={e=>{if(e.target===e.currentTarget)setFollowOpen(false)}} style={{position:"fixed",inset:0,background:"rgba(17,24,39,.5)",zIndex:300,display:"flex",alignItems:"flex-end",backdropFilter:"blur(6px)"}}>
-        <div style={{background:W,borderRadius:"16px 16px 0 0",width:"100%",maxHeight:"86vh",display:"flex",flexDirection:"column"}}>
+        <div style={{background:W,borderRadius:"16px 16px 0 0",width:"100%",maxWidth:430,margin:"0 auto",maxHeight:"86vh",display:"flex",flexDirection:"column"}}>
           <div style={{width:36,height:4,background:BD,borderRadius:2,margin:"12px auto 8px",flexShrink:0}}/>
           {/* Tabs */}
           <div style={{display:"flex",borderBottom:`1px solid ${BD}`,flexShrink:0}}>
@@ -1494,7 +2217,8 @@ function AthleteApp({user=null}){
     );})()} 
 
     {/* SETTINGS */}
-    {settingsOpen&&<div style={{position:"fixed",inset:0,background:W,zIndex:400,display:"flex",flexDirection:"column",overflowY:"auto"}}>
+    {settingsOpen&&<div style={{position:"fixed",inset:0,background:"#050505",zIndex:400}}>
+      <div style={{width:"100%",maxWidth:430,height:"100%",margin:"0 auto",background:W,display:"flex",flexDirection:"column",overflowY:"auto"}}>
       <div style={{background:W,borderBottom:`1px solid ${BD}`,padding:"0 16px",height:56,display:"flex",alignItems:"center",justifyContent:"space-between",flexShrink:0}}>
         <button onClick={()=>setSettingsOpen(false)} style={{background:"none",border:"none",cursor:"pointer",display:"flex",alignItems:"center",gap:6,padding:0}}><Ic.back size={18} color={B}/><span style={{fontSize:13,fontWeight:600,color:B}}>Back</span></button>
         <span style={{fontSize:14,fontWeight:700,color:T}}>Settings</span>
@@ -1542,6 +2266,7 @@ function AthleteApp({user=null}){
           <p style={{fontSize:10,color:TL,textAlign:"center",marginTop:16}}>FastTrack v1.0.0 · © 2026 FastTrack Recruitment Inc.</p>
         </div>
       </div>
+      </div>
     </div>}
   </div>;
 }
@@ -1558,6 +2283,11 @@ function CoachApp({user=null}){
   const[campOpen,setCampOpen]=useState(false);const[selCamp,setSelCamp]=useState(null);
   const[cf,setCf]=useState({title:"",date:"",loc:"",cost:"",total:"",sport:"Basketball",desc:""});
   const[nmo,setNmo]=useState(false);const[nma,setNma]=useState(null);const[nmt,setNmt]=useState("");const[favs,setFavs]=useState([]);const[followed,setFollowed]=useState([]);const[settingsOpen,setSettingsOpen]=useState(false);
+  const[caiOpen,setCaiOpen]=useState(false);
+  const[caiAth,setCaiAth]=useState(null);
+  const[caiCtx,setCaiCtx]=useState("");
+  const[caiStep,setCaiStep]=useState(0);
+  const[caiDraft,setCaiDraft]=useState("");
   const msg=useMsgs(SC);
   const notify=m=>{setNotif(m);setTimeout(()=>setNotif(null),3e3);};
   const allB=Object.values(board).flat();
@@ -1572,6 +2302,36 @@ function CoachApp({user=null}){
     if(ex){msg.setT(ts=>ts.map(t=>t.id===ex.id?{...t,msgs:[...t.msgs,m]}:t));msg.setA({...ex,msgs:[...ex.msgs,m]});}
     else{const t={id:Date.now(),athId:a.id,athName:`${a.first} ${a.last}`,school:a.school,athEmail:`${a.first.toLowerCase()}@email.com`,unread:0,msgs:[m]};msg.setT(ts=>[t,...ts]);msg.setA(t);if(!onB(a.id))saveB(a,"contacted");}
     setNmo(false);setNma(null);setNmt("");setTab("messages");notify(`Message sent to ${a.first} ${a.last}`);
+  };
+  const resetCai=()=>{setCaiOpen(false);setCaiAth(null);setCaiCtx("");setCaiStep(0);setCaiDraft("");};
+  const genDraftCoach=(ath,coach,ctx)=>{
+    const coachFirst=(coach?.first||"Coach");
+    const coachLast=(coach?.last||"");
+    const pos=(ath?.positions||["athlete"])[0];
+    const schName=coach?.school||"our program";
+    const div=coach?.div||"";
+    const sport=coach?.sport||"";
+    const ctxPara=ctx?.trim()||`After reviewing your profile and highlights, I'm impressed by what I see. Your game translates well to what we look for in our system.`;
+    return `Dear ${ath?.first||"Athlete"},\n\nMy name is Coach ${coachLast||coachFirst} from ${schName}'s ${div} ${sport} program. I came across your recruiting profile and wanted to reach out personally.\n\n${ctxPara}\n\nWe believe you could be an excellent fit here at ${schName} and I'd love to schedule a call to tell you more about our program and learn more about your goals and recruiting timeline.\n\nAre you available for a call this week?\n\nCoach ${coachLast||coachFirst}\n${schName} ${sport} | ${div}`;
+  };
+  const launchCAI=()=>{
+    if(!caiAth){notify("Select an athlete");return;}
+    setCaiStep(1);
+    setTimeout(()=>{
+      const ath=ADB.find(a=>a.id===caiAth);
+      setCaiDraft(genDraftCoach(ath,user,caiCtx));
+      setCaiStep(2);
+    },1500);
+  };
+  const sendCaiDraft=()=>{
+    const ath=ADB.find(a=>a.id===caiAth);if(!ath||!caiDraft.trim())return;
+    const now=new Date();
+    const ts=`${now.toLocaleDateString("en-US",{month:"short",day:"numeric"})}, ${now.toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"})}`;
+    const m={id:Date.now(),from:"coach",text:caiDraft.trim(),time:ts};
+    const ex=msg.threads.find(t=>t.athId===ath.id);
+    if(ex){msg.setT(ts=>ts.map(t=>t.id===ex.id?{...t,msgs:[...t.msgs,m]}:t));}
+    else{const t={id:Date.now(),athId:ath.id,athName:`${ath.first} ${ath.last}`,school:ath.school,athEmail:`${ath.first.toLowerCase()}@email.com`,unread:0,msgs:[m]};msg.setT(ts=>[t,...ts]);if(!onB(ath.id))saveB(ath,"contacted");}
+    resetCai();setTab("messages");notify(`Sent to ${ath.first} ${ath.last}`);
   };
   const postCamp=()=>{
     if(!cf.title||!cf.date||!cf.loc)return;
@@ -1846,7 +2606,10 @@ function CoachApp({user=null}){
         {/* Header */}
         <div style={{background:W,padding:"12px 17px",borderBottom:`1px solid ${BD}`,display:"flex",alignItems:"center",justifyContent:"space-between",position:"sticky",top:0,zIndex:10}}>
           <div><p style={{fontSize:13,fontWeight:700,color:T,margin:0,marginBottom:1}}>Messages</p><p style={{fontSize:11,color:TL,margin:0}}>Connected to {cEmail}</p></div>
-          <Btn ch="New Message" sm ac={B} onClick={()=>setNmo(true)}/>
+          <div style={{display:"flex",gap:7}}>
+            <Btn ch="AI Draft" sm v="o" ac={B} onClick={()=>{resetCai();setCaiOpen(true);}}/>
+            <Btn ch="New Message" sm ac={B} onClick={()=>setNmo(true)}/>
+          </div>
         </div>
         <div style={{background:GR,borderBottom:`1px solid ${BD}`,padding:"7px 17px",display:"flex",alignItems:"center",gap:6}}><Ic.mail size={12} color={TM}/><p style={{fontSize:11,color:TM,margin:0}}>Sending from <strong style={{color:T}}>{cEmail}</strong></p></div>
 
@@ -1939,6 +2702,74 @@ function CoachApp({user=null}){
       <Btn ch="Post Camp" full ac={B} dis={!cf.title||!cf.date||!cf.loc} onClick={postCamp}/>
     </>}/>
 
+    {/* COACH AI DRAFT PANEL */}
+    {caiOpen&&<div style={{position:"fixed",inset:0,background:"#050505",zIndex:400}}>
+      <div style={{width:"100%",maxWidth:430,height:"100%",margin:"0 auto",background:W,display:"flex",flexDirection:"column"}}>
+        <div style={{background:W,borderBottom:`1px solid ${BD}`,padding:"0 16px",height:56,display:"flex",alignItems:"center",justifyContent:"space-between",flexShrink:0}}>
+          <button onClick={resetCai} style={{background:"none",border:"none",cursor:"pointer",display:"flex",alignItems:"center",gap:6,padding:0}}>
+            <Ic.back size={18} color={B}/><span style={{fontSize:13,fontWeight:600,color:B}}>Messages</span>
+          </button>
+          <span style={{fontSize:14,fontWeight:700,color:T}}>AI Draft</span>
+          <div style={{width:72}}/>
+        </div>
+        <div style={{flex:1,overflowY:"auto",padding:"16px 16px 40px"}}>
+
+          {/* ── STEP 0: SETUP ── */}
+          {caiStep===0&&<>
+            <FL label="Athlete" ch={<FSel value={caiAth||""} onChange={e=>setCaiAth(Number(e.target.value))} ch={[<option key="" value="" disabled>Select an athlete…</option>,...ADB.map(a=><option key={a.id} value={a.id}>{a.first} {a.last} — {a.positions[0]} · Class of {a.gradYear}</option>)]}/>}/>
+            {caiAth&&(()=>{const a=ADB.find(x=>x.id===caiAth);return a?<div style={{background:BL,border:`1px solid ${BR}`,borderRadius:6,padding:"9px 12px",marginTop:-8,marginBottom:16,display:"flex",gap:10,alignItems:"center"}}>
+              <div style={{width:32,height:32,borderRadius:"50%",background:BR,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:700,color:B,flexShrink:0}}>{a.first[0]}{a.last[0]}</div>
+              <div>
+                <p style={{fontSize:12,fontWeight:700,color:T,margin:0}}>{a.first} {a.last}</p>
+                <p style={{fontSize:11,color:TM,margin:0}}>{a.positions[0]} · Class of {a.gradYear} · {a.school}, {a.state} · GPA {a.gpa}</p>
+              </div>
+            </div>:null;})()}
+            <FL label="Context" hint="(optional)" ch={<div style={{border:`1.5px solid ${BD}`,borderRadius:8,padding:"9px 12px"}} onFocus={e=>e.currentTarget.style.borderColor=B} onBlur={e=>e.currentTarget.style.borderColor=BD}>
+              <textarea rows={4} placeholder="Why are you reaching out? Any specific film you liked, a recent tournament, mutual connection, scholarship interest…" value={caiCtx} onChange={e=>setCaiCtx(e.target.value)} style={{background:"transparent",width:"100%",border:"none",outline:"none",fontSize:13,color:T,lineHeight:1.6,fontFamily:"inherit"}}/>
+            </div>}/>
+            <div style={{background:BL,border:`1px solid ${BR}`,borderRadius:6,padding:"8px 12px",marginBottom:16,display:"flex",gap:6}}>
+              <Ic.info size={12} active/><p style={{fontSize:11,color:"#C4622A",margin:0,lineHeight:1.5}}>AI will personalize the message using the athlete's profile — position, grad year, school, and GPA.</p>
+            </div>
+            <Btn ch="Generate Draft →" full dis={!caiAth} onClick={launchCAI}/>
+          </>}
+
+          {/* ── STEP 1: GENERATING ── */}
+          {caiStep===1&&<div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",minHeight:320,gap:16}}>
+            <div style={{width:52,height:52,borderRadius:"50%",background:BL,border:`2px solid ${BR}`,display:"flex",alignItems:"center",justifyContent:"center"}}>
+              <svg width={24} height={24} viewBox="0 0 24 24" fill="none" stroke={B} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                <line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/>
+                <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite"/>
+              </svg>
+            </div>
+            <div style={{textAlign:"center"}}>
+              <p style={{fontSize:14,fontWeight:700,color:T,margin:0,marginBottom:4}}>Generating your draft…</p>
+              <p style={{fontSize:12,color:TM,margin:0}}>Personalizing for this athlete</p>
+            </div>
+          </div>}
+
+          {/* ── STEP 2: EDIT & SEND ── */}
+          {caiStep===2&&<>
+            <div style={{marginBottom:14,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+              <p style={{fontSize:13,fontWeight:700,color:T,margin:0}}>Your Draft</p>
+              <button onClick={()=>{setCaiStep(0);setCaiDraft("");}} style={{background:"none",border:"none",cursor:"pointer",fontSize:12,color:TM,fontWeight:500,padding:0}}>Edit Setup</button>
+            </div>
+            {caiAth&&(()=>{const a=ADB.find(x=>x.id===caiAth);return a?<div style={{background:GR,border:`1px solid ${BD}`,borderRadius:6,padding:"7px 12px",marginBottom:12,display:"flex",gap:8,alignItems:"center"}}>
+              <div style={{width:26,height:26,borderRadius:"50%",background:BD,display:"flex",alignItems:"center",justifyContent:"center",fontSize:10,fontWeight:700,color:TM,flexShrink:0}}>{a.first[0]}{a.last[0]}</div>
+              <p style={{fontSize:11,color:TM,margin:0}}>To: <span style={{fontWeight:700,color:T}}>{a.first} {a.last}</span> · {a.positions[0]} · {a.school}</p>
+            </div>:null;})()}
+            <div style={{border:`1.5px solid ${BD}`,borderRadius:8,padding:"12px 14px",marginBottom:14}} tabIndex={-1} onFocus={e=>e.currentTarget.style.borderColor=B} onBlur={e=>e.currentTarget.style.borderColor=BD}>
+              <textarea rows={14} value={caiDraft} onChange={e=>setCaiDraft(e.target.value)} style={{background:"transparent",width:"100%",border:"none",outline:"none",fontSize:13,color:T,lineHeight:1.65,fontFamily:"inherit"}}/>
+            </div>
+            <div style={{background:BL,border:`1px solid ${BR}`,borderRadius:6,padding:"8px 12px",marginBottom:14,display:"flex",gap:6}}>
+              <Ic.info size={12} active/><p style={{fontSize:11,color:"#C4622A",margin:0}}>Edit freely — this is your message, the AI just got you started.</p>
+            </div>
+            <Btn ch="Send Message" full dis={!caiDraft.trim()} ac={B} onClick={sendCaiDraft}/>
+          </>}
+
+        </div>
+      </div>
+    </div>}
+
     <Sheet open={nmo} onClose={()=>{setNmo(false);setNma(null);setNmt("");}} title="New Message" ch={<>
       <FL label="To — Select Athlete" ch={<><FSel ch={[<option key="" value="" disabled>Select an athlete…</option>,...ADB.map(a=><option key={a.id} value={a.id}>{a.first} {a.last} — {a.school}, {a.state}</option>)]} value={nma||""} onChange={e=>setNma(Number(e.target.value))}/>{nma&&<p style={{fontSize:11,color:TM,marginTop:4}}>Sends to <span style={{color:B,fontWeight:600}}>{ADB.find(a=>a.id===nma)?.first.toLowerCase()}@email.com</span></p>}</>}/>
       <FL label="Message" ch={<div style={{border:`1.5px solid ${BD}`,borderRadius:4,padding:"9px 12px"}} onFocus={e=>e.currentTarget.style.borderColor=B} onBlur={e=>e.currentTarget.style.borderColor=BD}><textarea rows={5} value={nmt} onChange={e=>setNmt(e.target.value)} placeholder="Write your message…" style={{background:"transparent",width:"100%",border:"none",outline:"none",fontSize:13,color:T}}/></div>}/>
@@ -1949,7 +2780,8 @@ function CoachApp({user=null}){
     {notif&&<div className="ctoast">{notif}</div>}
 
     {/* SETTINGS */}
-    {settingsOpen&&<div style={{position:"fixed",inset:0,background:W,zIndex:400,display:"flex",flexDirection:"column",overflowY:"auto"}}>
+    {settingsOpen&&<div style={{position:"fixed",inset:0,background:"#050505",zIndex:400}}>
+      <div style={{width:"100%",maxWidth:430,height:"100%",margin:"0 auto",background:W,display:"flex",flexDirection:"column",overflowY:"auto"}}>
       <div style={{background:W,borderBottom:`1px solid ${BD}`,padding:"0 16px",height:56,display:"flex",alignItems:"center",justifyContent:"space-between",flexShrink:0}}>
         <button onClick={()=>setSettingsOpen(false)} style={{background:"none",border:"none",cursor:"pointer",display:"flex",alignItems:"center",gap:6,padding:0}}><Ic.back size={18} color={B}/><span style={{fontSize:13,fontWeight:600,color:B}}>Back</span></button>
         <span style={{fontSize:14,fontWeight:700,color:T}}>Settings</span>
@@ -1997,6 +2829,7 @@ function CoachApp({user=null}){
           <p style={{fontSize:10,color:TL,textAlign:"center",marginTop:16}}>FastTrack v1.0.0 · © 2026 FastTrack Recruitment Inc.</p>
         </div>
       </div>
+      </div>
     </div>}
   </div>;
 }
@@ -2039,17 +2872,54 @@ export default function Root(){
   const[uData,setUD]=useState(null);
   const[cData,setCD]=useState(null);
   useEffect(()=>{
+    // #region agent log
+    fetch('http://127.0.0.1:7282/ingest/8e43e297-ecf0-462e-bc78-418cef0f1596',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'edb537'},body:JSON.stringify({sessionId:'edb537',location:'App.jsx:Root',message:'screen snapshot',data:{screen,uRole:uData?.role??null,cRole:cData?.role??null},timestamp:Date.now(),hypothesisId:'B'})}).catch(()=>{});
+    // #endregion
+  },[screen,uData,cData]);
+  useEffect(()=>{
     document.documentElement.setAttribute('data-theme','dark');
     supabase.auth.getSession().then(({data:{session}})=>{
+      // #region agent log
+      fetch('http://127.0.0.1:7282/ingest/8e43e297-ecf0-462e-bc78-418cef0f1596',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'edb537'},body:JSON.stringify({sessionId:'edb537',location:'App.jsx:getSession',message:'getSession resolved',data:{hasSession:!!session,metaRole:session?.user?.user_metadata?.role??null},timestamp:Date.now(),hypothesisId:'B'})}).catch(()=>{});
+      // #endregion
       if(session){
         const m=session.user.user_metadata;
-        if(m?.role==="athlete"){setUD(m);setScreen("athlete-app");}
+        if(m?.role==="athlete"){
+          if(m?.gender==="Male")localStorage.setItem("ft_gender","man");
+          else if(m?.gender==="Female")localStorage.setItem("ft_gender","woman");
+          setUD(m);setScreen("athlete-app");
+        }
         else if(m?.role==="coach"){setCD(m);setScreen("coach-app");}
         else{setScreen("role");}
-      }else{setScreen("role");}
+      }else{
+        // #region agent log
+        fetch('http://127.0.0.1:7282/ingest/8e43e297-ecf0-462e-bc78-418cef0f1596',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'edb537'},body:JSON.stringify({sessionId:'edb537',location:'App.jsx:getSession',message:'no session -> guarded setScreen (only from loading)',data:{},timestamp:Date.now(),hypothesisId:'B'})}).catch(()=>{});
+        // #endregion
+        setScreen(s=>s==="loading"?"role":s);
+      }
     });
-    const{data:{subscription}}=supabase.auth.onAuthStateChange((_ev,session)=>{
-      if(!session){setScreen("role");setUD(null);setCD(null);}
+    const{data:{subscription}}=supabase.auth.onAuthStateChange((event,session)=>{
+      // #region agent log
+      fetch('http://127.0.0.1:7282/ingest/8e43e297-ecf0-462e-bc78-418cef0f1596',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'edb537'},body:JSON.stringify({sessionId:'edb537',location:'App.jsx:onAuthStateChange',message:'auth event',data:{event,hasSession:!!session,metaRole:session?.user?.user_metadata?.role??null},timestamp:Date.now(),hypothesisId:'C'})}).catch(()=>{});
+      // #endregion
+      if(event==="SIGNED_OUT"||event==="USER_DELETED"){
+        setScreen("role");
+        setUD(null);
+        setCD(null);
+        return;
+      }
+      if(session){
+        const m=session.user.user_metadata;
+        if(m?.role==="athlete"){
+          if(m?.gender==="Male")localStorage.setItem("ft_gender","man");
+          else if(m?.gender==="Female")localStorage.setItem("ft_gender","woman");
+          setUD(m);
+          setScreen("athlete-app");
+        }else if(m?.role==="coach"){
+          setCD(m);
+          setScreen("coach-app");
+        }
+      }
     });
     return()=>subscription.unsubscribe();
   },[]);
@@ -2066,9 +2936,14 @@ export default function Root(){
   },[]);
   const content=
     screen==="loading"?<div style={{minHeight:"100vh",background:"#0D0D0D",display:"flex",alignItems:"center",justifyContent:"center"}}><p style={{color:"#555",fontSize:13}}>Loading…</p></div>:
-    screen==="role"?<RoleSelect onSelect={r=>setScreen(`${r}-onboard`)} onJump={jump} onSignIn={()=>setScreen("sign-in")}/>:
-    screen==="sign-in"?<SignIn onBack={()=>setScreen("role")} onSuccess={(role,data)=>{if(role==="athlete"){setUD(data);setScreen("athlete-app");}else{setCD(data);setScreen("coach-app");}}}/>:
-    screen==="athlete-onboard"?<AthleteOnboard onComplete={d=>{setUD(d);setScreen("athlete-app");}} onSignIn={()=>setScreen("sign-in")}/>:
+    screen==="role"?<RoleSelect onSelect={r=>{if(r==="athlete")localStorage.removeItem(FT_ATHLETE_ONBOARD_DRAFT);setScreen(`${r}-onboard`);}} onJump={jump} onSignIn={()=>setScreen("sign-in")}/>:
+    screen==="sign-in"?<SignIn onBack={()=>setScreen("role")} onSuccess={(role,data)=>{if(role==="athlete"){if(data?.gender==="Male")localStorage.setItem("ft_gender","man");else if(data?.gender==="Female")localStorage.setItem("ft_gender","woman");setUD(data);setScreen("athlete-app");}else{setCD(data);setScreen("coach-app");}}}/>:
+    screen==="athlete-onboard"?<AthleteOnboard onComplete={d=>{
+      // #region agent log
+      fetch('http://127.0.0.1:7282/ingest/8e43e297-ecf0-462e-bc78-418cef0f1596',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'edb537'},body:JSON.stringify({sessionId:'edb537',location:'App.jsx:onComplete athlete',message:'onComplete handler',data:{hasRole:!!d?.role,role:String(d?.role||'')},timestamp:Date.now(),hypothesisId:'D'})}).catch(()=>{});
+      // #endregion
+      setUD(d);setScreen("athlete-app");
+    }} onSignIn={()=>setScreen("sign-in")}/>:
     screen==="coach-onboard"?<CoachOnboard onComplete={d=>{setCD(d);setScreen("coach-app");}} onSignIn={()=>setScreen("sign-in")}/>:
     screen==="athlete-app"?<AthleteApp user={uData}/>:
     screen==="coach-app"?<CoachApp user={cData}/>:null;
